@@ -13,7 +13,7 @@ import { getPolicies } from '@/domain/settings'
 import { findProposalByToken } from '@/domain/proposals'
 import type { Slot } from '@/domain/scheduling'
 import { patientRepo, audit } from '@/data/repositories'
-import { Alert, Button, ButtonLink, Checkbox, EmptyState, Field, Input, Select, SimBadge } from '@/ui/core'
+import { Alert, Button, ButtonLink, Checkbox, DemoOnly, demoText, EmptyState, Field, Input, Select, SimBadge } from '@/ui/core'
 import { useAction } from '@/ui/overlay'
 import { ClinicLogo, QlinicLogo, ThemeToggle } from '@/ui/brand'
 import { InstallAppButton, OfflineNotice, useNetworkStatus } from '@/pwa/client'
@@ -40,7 +40,7 @@ function PublicShell({ org, children }: { org: Organization; children: React.Rea
       <div className="pt-context"><OfflineNotice /></div>
       <main id="main" className="pt-main" tabIndex={-1}>{children}</main>
       <footer className="pt-footer">
-        <span>{org.name} · página demonstrativa com dados fictícios</span>
+        <span>{org.name}<DemoOnly> · página demonstrativa com dados fictícios</DemoOnly></span>
         <span className="row" style={{ '--gap': '6px' } as React.CSSProperties}>plataforma <QlinicLogo height={14} decorative /><span className="sr-only">Qlinic</span></span>
       </footer>
     </div>
@@ -84,7 +84,7 @@ export function ClinicPublicPage() {
                 </li>
               ))}
             </ul>
-            {pp.showPrices && <p className="small muted">Valores de referência demonstrativos; podem variar conforme avaliação.</p>}
+            {pp.showPrices && <p className="small muted">{demoText('Valores de referência demonstrativos; podem variar conforme avaliação.', 'Valores de referência; podem variar conforme avaliação.')}</p>}
           </section>
         )}
         {pp.showProfessionals && pros.length > 0 && (
@@ -198,7 +198,7 @@ export function PublicBookingPage() {
             <section className="pt-card">
               <div className="form-grid">
                 <Field label={org.segment === 'veterinaria' ? 'Nome do tutor' : 'Nome completo'} required error={errors.name} id="pb-name"><Input value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} autoComplete="name" maxLength={120} /></Field>
-                <Field label="Telefone (WhatsApp)" required error={errors.phone} id="pb-phone" hint="Use um número fictício, ex.: (00) 90000-0000"><Input value={f.phone} mask={maskPhone} onChange={(e) => setF({ ...f, phone: e.target.value })} inputMode="tel" autoComplete="tel" /></Field>
+                <Field label="Telefone (WhatsApp)" required error={errors.phone} id="pb-phone" hint={demoText('Use um número fictício, ex.: (00) 90000-0000', 'Com DDD, ex.: (00) 90000-0000')}><Input value={f.phone} mask={maskPhone} onChange={(e) => setF({ ...f, phone: e.target.value })} inputMode="tel" autoComplete="tel" /></Field>
                 <Field label="E-mail" hint="Opcional — use domínio .exemplo.test" error={errors.email} id="pb-email"><Input type="email" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} autoComplete="email" maxLength={160} /></Field>
               </div>
               <div>
@@ -206,7 +206,7 @@ export function PublicBookingPage() {
                   label={`Autorizo ${org.name} a entrar em contato por WhatsApp/e-mail sobre esta solicitação.`} hint="Somente mensagens sobre o agendamento. Sem campanhas." />
                 {errors.consent && <span id="pb-consent-err" className="error small" role="alert" style={{ color: 'var(--q-danger)' }}>{errors.consent}</span>}
               </div>
-              <p className="tiny muted">Não informe dados de saúde aqui. Demonstração: use apenas dados fictícios.</p>
+              <p className="tiny muted">{demoText('Não informe dados de saúde aqui. Demonstração: use apenas dados fictícios.', 'Não informe dados de saúde aqui.')}</p>
             </section>
             <div className="form-actions">
               <Button onClick={() => setStep(1)}>Voltar</Button>
@@ -258,7 +258,7 @@ export function ProposalLinkPage() {
   return (
     <PublicShell org={org}>
       <div className="stack" style={{ maxWidth: 860, margin: '0 auto' }}>
-        <Alert tone="neutral">Links sensíveis futuros exigirão autenticação, expiração e revogação; este protótipo usa apenas dados fictícios.</Alert>
+        <Alert tone="neutral">{demoText('Links sensíveis futuros exigirão autenticação, expiração e revogação; este protótipo usa apenas dados fictícios.', 'Links sensíveis futuros exigirão autenticação, expiração e revogação.')}</Alert>
         <ProposalExperience org={org} proposalId={p!.id} by={by} signerName={signer} />
       </div>
     </PublicShell>

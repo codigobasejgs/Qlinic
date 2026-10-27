@@ -14,9 +14,14 @@
     "test:watch": "vitest",
     "e2e": "playwright test",
     "icons": "node scripts/gen-tenant-pwa.mjs --png",
-    "manifests": "node scripts/gen-tenant-pwa.mjs"
+    "manifests": "node scripts/gen-tenant-pwa.mjs",
+    "db:migrate": "node scripts/ops/migrate.mjs",
+    "db:test-rls": "node scripts/ops/test-rls.mjs",
+    "db:seed-demo": "node scripts/ops/seed-demo.mjs",
+    "fn:deploy": "node scripts/ops/deploy-functions.mjs"
   },
   "dependencies": {
+    "@supabase/supabase-js": "2.117.3",
     "lucide-react": "1.62.0",
     "react": "19.3.1",
     "react-dom": "19.3.1",

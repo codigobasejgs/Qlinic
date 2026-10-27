@@ -6,7 +6,7 @@ import { db, useCollection } from '@/data/store'
 import { audit } from '@/data/repositories'
 import type { AestheticPackage } from '@/domain/modules'
 import type { ID, Patient } from '@/domain/types'
-import { Alert, Badge, Button, Checkbox, Dialog, EmptyState, Field, ImageCompare, Input, Progress, Section, Select, Tabs, TabPanel, Textarea, useAction, useConfirm, useLookup, ZoomPan } from '@/ui'
+import { Alert, Badge, Button, Checkbox, demoText, Dialog, EmptyState, Field, ImageCompare, Input, Progress, Section, Select, Tabs, TabPanel, Textarea, useAction, useConfirm, useLookup, ZoomPan } from '@/ui'
 import { formatCivil, formatDateTime, nowISO, todayCivil } from '@/lib/dates'
 import { formatBRL } from '@/lib/money'
 import { groupBy, uid } from '@/lib/util'
@@ -272,7 +272,7 @@ function CompareTab({ patient }: { patient: Patient }) {
     db.insert(t.tenantId, 'aestheticComparisons', { id, tenantId: t.tenantId, createdAt: nowISO(), patientId: patient.id, title: 'Novo comparativo', regionLabel: 'Face (ilustração)', beforeOn: todayCivil(), afterOn: todayCivil(), variant: list.length + 1, offset: { x: 0, y: 0 }, consent: { clinical: { granted: false }, marketing: { granted: false } }, history: [{ at: nowISO(), by: actor.name, text: 'Comparativo criado' }] })
     setSel(id)
   }, 'Comparativo criado (ilustração fictícia)')
-  if (!c) return <EmptyState title="Nenhum comparativo" action={canWrite ? <Button variant="primary" onClick={create}>Criar comparativo ilustrativo</Button> : undefined}>Imagens são sempre ilustrações fictícias nesta demonstração.</EmptyState>
+  if (!c) return <EmptyState title="Nenhum comparativo" action={canWrite ? <Button variant="primary" onClick={create}>Criar comparativo ilustrativo</Button> : undefined}>{demoText('Imagens são sempre ilustrações fictícias nesta demonstração.', 'Imagens são sempre ilustrações fictícias, nunca fotos reais.')}</EmptyState>
   const clinicalOk = c.consent.clinical.granted
   const mktOk = c.consent.marketing.granted
   return (

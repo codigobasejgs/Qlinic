@@ -97,10 +97,54 @@ function emit(key: string) {
   globalListeners.forEach((l) => l())
 }
 
+// ---------- Sincronização remota (modo conectado) ----------
+// Quando ativo, o store é cache local de um tenant hidratado do servidor e cada escrita gera um diff enviado ao backend.
+// Tenants "remotos" nunca recebem seed e nunca persistem em localStorage (dados reais não ficam no navegador).
+export interface RemoteSink {
+  /** O tenant é servido pelo backend? */
+  owns(tenantId: ID): boolean
+  /** Chamado a cada escrita com upserts/deletes da coleção. Erros são tratados pelo sink (fila + aviso). */
+  write(tenantId: ID, collection: string, upserts: AnyItem[], deletes: ID[]): void
+}
+let remote: RemoteSink | null = null
+export function setRemoteSink(r: RemoteSink | null) { remote = r }
+
+/** Coleções de plataforma: registros remotos (organizações reais, assinaturas…) convivem com os demo locais. */
+export interface PlatformRemoteSink {
+  isRemote(collection: string, item: AnyItem): boolean
+  /** Separa, das mudanças, as que pertencem ao servidor. */
+  filter(collection: string, upserts: AnyItem[], deletes: ID[]): { upserts: AnyItem[]; deletes: ID[] }
+  write(collection: string, upserts: AnyItem[], deletes: ID[]): void
+}
+let platformRemote: PlatformRemoteSink | null = null
+export function setPlatformRemoteSink(r: PlatformRemoteSink | null) { platformRemote = r }
+/** Mescla registros remotos na coleção de plataforma (substitui os remotos anteriores, mantém os locais). */
+export function hydratePlatform(name: string, remoteItems: AnyItem[]) {
+  const key = pKey(name)
+  const local = (cache.get(key) ?? loadPlatform(name)).filter((x) => !platformRemote?.isRemote(name, x))
+  const ids = new Set(remoteItems.map((x) => x.id))
+  cache.set(key, [...local.filter((x) => !ids.has(x.id)), ...remoteItems])
+  emit(key)
+}
+/** Carrega coleção vinda do servidor sem gerar escrita de volta. */
+export function hydrate(tenantId: ID, name: string, items: AnyItem[]) {
+  const key = tKey(tenantId, name)
+  cache.set(key, items)
+  emit(key)
+}
+function diff(prev: AnyItem[], next: AnyItem[]) {
+  const before = new Map(prev.map((x) => [x.id, x]))
+  const upserts = next.filter((x) => before.get(x.id) !== x)
+  const keep = new Set(next.map((x) => x.id))
+  const deletes = prev.filter((x) => !keep.has(x.id)).map((x) => x.id)
+  return { upserts, deletes }
+}
+
 function loadTenant(tenantId: ID, name: string): AnyItem[] {
   const key = tKey(tenantId, name)
   const hit = cache.get(key)
   if (hit) return hit
+  if (remote?.owns(tenantId)) { const empty: AnyItem[] = []; cache.set(key, empty); return empty } // aguardando hidratação
   let data = readLS(key)
   if (!data) {
     const seed = tenantSeeds.get(name)
@@ -135,8 +179,14 @@ export const db = {
   set<K extends TenantCollectionName>(tenantId: ID, name: K, items: TenantCollections[K]) {
     const key = tKey(tenantId, name as string)
     const arr = [...(items as AnyItem[])]
-    cache.set(key, arr)
-    writeLS(key, arr)
+    if (remote?.owns(tenantId)) {
+      const { upserts, deletes } = diff(cache.get(key) ?? [], arr)
+      cache.set(key, arr)
+      if (upserts.length || deletes.length) remote.write(tenantId, name as string, upserts, deletes)
+    } else {
+      cache.set(key, arr)
+      writeLS(key, arr)
+    }
     emit(key)
   },
   insert<K extends TenantCollectionName>(tenantId: ID, name: K, item: TenantCollections[K][number]) {
@@ -170,8 +220,14 @@ export const platformDb = {
   set<K extends PlatformCollectionName>(name: K, items: PlatformCollections[K]) {
     const key = pKey(name as string)
     const arr = [...(items as unknown as AnyItem[])]
+    if (platformRemote) {
+      const { upserts, deletes } = diff(cache.get(key) ?? [], arr)
+      const r = platformRemote.filter(name as string, upserts, deletes)
+      if (r.upserts.length || r.deletes.length) platformRemote.write(name as string, r.upserts, r.deletes)
+    }
     cache.set(key, arr)
-    writeLS(key, arr)
+    // registros vindos do servidor não vão para o localStorage
+    writeLS(key, platformRemote ? arr.filter((x) => !platformRemote!.isRemote(name as string, x)) : arr)
     emit(key)
   },
   insert<K extends PlatformCollectionName>(name: K, item: PlatformCollections[K] extends (infer T)[] ? T : never) {
@@ -232,6 +288,11 @@ export function evictOtherTenants(activeTenantId: ID | null) {
   for (const key of [...cache.keys()]) {
     if (key.startsWith(`${PREFIX}t:`) && (!activeTenantId || !key.startsWith(`${PREFIX}t:${activeTenantId}:`))) cache.delete(key)
   }
+}
+
+/** Descarta do cache tudo de um tenant (logout do modo conectado: dados reais saem da memória). */
+export function evictTenant(tenantId: ID) {
+  for (const key of [...cache.keys()]) if (key.startsWith(`${PREFIX}t:${tenantId}:`)) { cache.delete(key); emit(key) }
 }
 
 /** Restaura TODA a demonstração (requer confirmação na UI). */

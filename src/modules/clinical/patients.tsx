@@ -7,7 +7,7 @@ import { useActor, useTenant } from '@/app/session'
 import { useCollection, db } from '@/data/store'
 import { patientRepo, audit } from '@/data/repositories'
 import {
-  Alert, Badge, Button, Checkbox, Combobox, DataTable, Dialog, EmptyState, Field, Input, PageHeader, Select, Tabs, TabPanel, useAction, useConfirm, useToast, type Column,
+  Alert, Badge, Button, Checkbox, Combobox, DataTable, demoText, Dialog, EmptyState, Field, Input, PageHeader, Select, Tabs, TabPanel, useAction, useConfirm, useToast, type Column,
 } from '@/ui'
 import { maskCPF, maskPhone, normalize, cx } from '@/lib/util'
 import { formatCivil, todayCivil, ageFromBirth } from '@/lib/dates'
@@ -155,7 +155,7 @@ export function PatientFormDialog({ onClose, onCreated, editing }: { onClose: ()
   }
 
   return (
-    <Dialog open onClose={onClose} size="lg" title={editing ? 'Editar cadastro' : isVet ? 'Cadastrar animal' : 'Cadastrar paciente'} description="Dados fictícios nesta demonstração. Campos com * são obrigatórios."
+    <Dialog open onClose={onClose} size="lg" title={editing ? 'Editar cadastro' : isVet ? 'Cadastrar animal' : 'Cadastrar paciente'} description={demoText('Dados fictícios nesta demonstração. Campos com * são obrigatórios.', 'Campos com * são obrigatórios.')}
       footer={<><Button onClick={onClose}>Cancelar</Button><Button variant="primary" onClick={() => submit(false)}>{editing ? 'Salvar alterações' : 'Salvar cadastro'}</Button></>}>
       <form className="stack" onSubmit={(e) => { e.preventDefault(); submit(false) }} noValidate>
         {dups && (

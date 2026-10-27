@@ -4,7 +4,7 @@ import { Send, RotateCcw, ArrowRightLeft, PlayCircle, Clock } from 'lucide-react
 import type { Channel, NotificationEvent, OutboxMessage } from '@/domain/types'
 import { useTenant } from '@/app/session'
 import { useCollection } from '@/data/store'
-import { Alert, Button, DataTable, Dialog, Field, Select, SimBadge, Timeline, useAction, useToast, DescList, type Column } from '@/ui'
+import { Alert, Button, DataTable, demoText, Dialog, Field, Select, SimBadge, Timeline, useAction, useToast, DescList, type Column } from '@/ui'
 import { formatDateTime, zonedParts } from '@/lib/dates'
 import { CHANNEL_LABEL, EVENTS, EVENT_KEYS, OUTBOX_STATUS } from './catalog'
 import { commConfig, fallbackMessage, processQueue, queueMessage, releaseNow, retryMessage, simulateProviderEvent, tzOf, type ProviderEvent } from './engine'
@@ -122,7 +122,7 @@ function Composer({ onClose }: { onClose: () => void }) {
   return (
     <Dialog open onClose={onClose} title="Enviar mensagem de teste" description="Simulado — nada é enviado. A chave de deduplicação inclui evento, destinatário, canal e dia." footer={<><Button onClick={onClose}>Cancelar</Button><Button variant="primary" icon={<Send />} onClick={send}>Enfileirar</Button></>}>
       <div className="stack">
-        <Field label="Destinatário (pessoa fictícia)" required><Select value={personId} onChange={(e) => setPersonId(e.target.value)}>{persons.map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}</Select></Field>
+        <Field label={demoText('Destinatário (pessoa fictícia)', 'Destinatário')} required><Select value={personId} onChange={(e) => setPersonId(e.target.value)}>{persons.map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}</Select></Field>
         <Field label="Evento"><Select value={event} onChange={(e) => setEvent(e.target.value as NotificationEvent)}>{EVENT_KEYS.map((k) => <option key={k} value={k}>{EVENTS[k].label}</option>)}</Select></Field>
         <Field label="Canal"><Select value={channel} onChange={(e) => setChannel(e.target.value as Channel)}>{(['whatsapp', 'email', 'push'] as Channel[]).map((c) => <option key={c} value={c}>{CHANNEL_LABEL[c]}</option>)}</Select></Field>
         {p && <p className="small muted">Preferências de {p.name}: WhatsApp {p.communication.whatsapp ? 'sim' : 'não'} · e-mail {p.communication.email ? 'sim' : 'não'} · push {p.communication.push ? 'sim' : 'não'}. Canal desativado ⇒ “suprimido”.</p>}

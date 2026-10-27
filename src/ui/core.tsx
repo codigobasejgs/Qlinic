@@ -3,6 +3,7 @@ import { forwardRef, useId, useRef, useState, type ButtonHTMLAttributes, type In
 import { Link } from 'react-router'
 import { AlertCircle, AlertTriangle, CheckCircle2, ChevronLeft, ChevronRight, Info, Inbox, FlaskConical } from 'lucide-react'
 import { cx, normalize } from '@/lib/util'
+import { isConnectedEnv } from '@/lib/env'
 
 type BtnVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'link'
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -77,10 +78,23 @@ export type Tone = 'neutral' | 'success' | 'warning' | 'danger' | 'info' | 'bran
 export function Badge({ tone = 'neutral', children, plain, title }: { tone?: Tone; children: ReactNode; plain?: boolean; title?: string }) {
   return <span className={cx('badge', tone !== 'neutral' && tone, plain && 'plain')} title={title}>{children}</span>
 }
-/** Selo obrigatório para fluxos externos simulados. */
-export function SimBadge({ children = 'Simulado — sem envio/cobrança real' }: { children?: ReactNode }) {
+/** Selo obrigatório para fluxos externos simulados.
+ *  `realWhenConnected`: o fluxo passa a ser real no ambiente conectado (ex.: IA, WhatsApp) — o selo some nele.
+ *  Sem a flag, o selo continua no conectado: o fluxo segue simulado (ex.: pagamento, TISS, NFS-e). */
+export function SimBadge({ children = 'Simulado — sem envio/cobrança real', realWhenConnected }: { children?: ReactNode; realWhenConnected?: boolean }) {
+  if (realWhenConnected && isConnectedEnv()) return null
   return <span className="sim-stamp"><FlaskConical size={14} aria-hidden="true" />{children}</span>
 }
+
+/** Texto exclusivo da demonstração (ex.: "dados fictícios"). Não aparece no ambiente conectado. */
+export function DemoOnly({ children }: { children: ReactNode }) {
+  return isConnectedEnv() ? null : <>{children}</>
+}
+/** Escolhe o texto conforme o ambiente. */
+export function demoText<T>(demo: T, connected: T): T {
+  return isConnectedEnv() ? connected : demo
+}
+export { isConnectedEnv }
 
 export function Alert({ tone = 'info', title, children, action }: { tone?: 'info' | 'success' | 'warning' | 'danger' | 'neutral'; title?: ReactNode; children?: ReactNode; action?: ReactNode }) {
   const Icon = tone === 'success' ? CheckCircle2 : tone === 'warning' ? AlertTriangle : tone === 'danger' ? AlertCircle : Info

@@ -7,7 +7,7 @@ import { db, useCollection } from '@/data/store'
 import { approveManualPayment, audit, billingRepo, chargeBalance, chargeNet } from '@/data/repositories'
 import { cashMovement, closeCash, expectedCash, openCash, openSessionFor, receiveAtDesk } from '@/domain/cash'
 import { getPolicies } from '@/domain/settings'
-import { Alert, Badge, Button, Checkbox, ClinicLogo, DataTable, DemoPaper, Dialog, Field, Input, Kpi, PageHeader, Select, SimBadge, Tabs, TabPanel, Textarea, useAction, useConfirm, EmptyState, type Column } from '@/ui'
+import { Alert, Badge, Button, Checkbox, ClinicLogo, DataTable, DemoPaper, demoText, Dialog, Field, Input, Kpi, PageHeader, Select, SimBadge, Tabs, TabPanel, Textarea, useAction, useConfirm, EmptyState, type Column } from '@/ui'
 import { addDaysCivil, formatCivil, formatDateTime, nowISO, todayCivil } from '@/lib/dates'
 import { formatBRL, type Cents } from '@/lib/money'
 import { normalize, uid } from '@/lib/util'
@@ -439,9 +439,9 @@ function Docs() {
       {c ? (
         <DemoPaper watermark={kind === 'nfse' ? 'NFS-e DEMONSTRATIVA — SEM VALIDADE FISCAL' : undefined}>
           <div className="stack">
-            <div className="row between"><ClinicLogo org={t.org} height={36} /><div className="right small">{t.org.legalName}<br />CNPJ {t.org.document} (fictício)<br />{unit?.address}</div></div>
+            <div className="row between"><ClinicLogo org={t.org} height={36} /><div className="right small">{t.org.legalName}<br />CNPJ {t.org.document}{demoText(' (fictício)', '')}<br />{unit?.address}</div></div>
             <h2 style={{ fontSize: 20 }}>{title}</h2>
-            <p>Pagador/paciente: <strong>{patient?.name}</strong>{patient?.cpf ? ` · CPF ${patient.cpf} (fictício)` : ''}</p>
+            <p>Pagador/paciente: <strong>{patient?.name}</strong>{patient?.cpf ? ` · CPF ${patient.cpf}${demoText(' (fictício)', '')}` : ''}</p>
             <table className="com-paper-table"><caption className="sr-only">Itens</caption><thead><tr><th>Descrição</th><th>Competência</th><th className="num">Valor</th></tr></thead>
               <tbody><tr><td>{c.description}</td><td>{formatCivil(c.competenceDate)}</td><td className="num">{formatBRL(c.amountCents)}</td></tr>{c.adjustmentsCents !== 0 && <tr><td>Encargos/descontos</td><td /><td className="num">{formatBRL(c.adjustmentsCents)}</td></tr>}</tbody></table>
             {kind !== 'nfse' && <table className="com-paper-table"><caption className="sr-only">Pagamentos</caption><thead><tr><th>Pagamento</th><th>Forma</th><th className="num">Valor</th></tr></thead>
@@ -470,7 +470,7 @@ function Registries() {
     <div className="grid grid-3">
       <section className="panel"><div className="panel-head"><h2 style={{ fontSize: 16 }}>Fornecedores ({sup.length})</h2></div><div className="panel-body stack">
         <ul className="divider-list small" style={{ listStyle: 'none', margin: 0, padding: 0 }}>{sup.map((x) => <li key={x.id} style={{ padding: '6px 0' }}>{x.name} <span className="muted">· {x.category}</span></li>)}</ul>
-        {can && <><Field label="Nome"><Input value={s.name} onChange={(e) => setS({ ...s, name: e.target.value })} /></Field><Field label="CNPJ (fictício)"><Input value={s.document} onChange={(e) => setS({ ...s, document: e.target.value })} /></Field><Field label="E-mail"><Input value={s.email} onChange={(e) => setS({ ...s, email: e.target.value })} placeholder="contato@exemplo.test" /></Field>
+        {can && <><Field label="Nome"><Input value={s.name} onChange={(e) => setS({ ...s, name: e.target.value })} /></Field><Field label={demoText('CNPJ (fictício)', 'CNPJ')}><Input value={s.document} onChange={(e) => setS({ ...s, document: e.target.value })} /></Field><Field label="E-mail"><Input value={s.email} onChange={(e) => setS({ ...s, email: e.target.value })} placeholder="contato@exemplo.test" /></Field>
           <Button onClick={() => { if (run(() => { if (!s.name.trim()) throw new Error('Informe o nome.'); db.insert(t.tenantId, 'suppliers', { ...base(), name: s.name.trim(), document: s.document || undefined, email: s.email || undefined, category: 'Insumos', active: true }) }, 'Fornecedor cadastrado.')) setS({ name: '', document: '', email: '' }) }}>Adicionar fornecedor</Button></>}
       </div></section>
       <section className="panel"><div className="panel-head"><h2 style={{ fontSize: 16 }}>Categorias ({cats.length})</h2></div><div className="panel-body stack">

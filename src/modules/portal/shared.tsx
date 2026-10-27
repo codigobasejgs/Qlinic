@@ -10,7 +10,7 @@ import { getPolicies } from '@/domain/settings'
 import { getSimScenario, setSimScenario, simulateOnlinePayment, submitPixReceipt, type SimScenario } from '@/domain/payments'
 import { acceptProposal, isExpired, itemTotal, proposalTotals, rejectProposal, validateSelection } from '@/domain/proposals'
 import { chargeBalance } from '@/data/repositories'
-import { Alert, Badge, Button, Checkbox, Field, Input, Select, SimBadge, Textarea, EmptyState } from '@/ui/core'
+import { Alert, Badge, Button, Checkbox, demoText, Field, Input, Select, SimBadge, Textarea, EmptyState } from '@/ui/core'
 import { useConfirm, useToast, useAction } from '@/ui/overlay'
 import { FileUpload, SignaturePad } from '@/ui/widgets'
 import { ClinicLogo } from '@/ui/brand'
@@ -107,7 +107,7 @@ const SCENARIOS: { value: SimScenario; label: string }[] = [
 export function receiptText(org: Organization, c: Charge, payerName: string) {
   const paid = c.payments.filter((p) => p.status === 'confirmado')
   return [
-    `RECIBO DEMONSTRATIVO — SEM VALIDADE FISCAL`, '', org.name, `CNPJ (fictício): ${org.document}`, '',
+    `RECIBO DEMONSTRATIVO — SEM VALIDADE FISCAL`, '', org.name, `CNPJ${demoText(' (fictício)', '')}: ${org.document}`, '',
     `Recebemos de: ${payerName}`, `Referente a: ${c.description}`, `Valor da cobrança: ${formatBRL(c.amountCents + c.adjustmentsCents)}`, '',
     ...paid.map((p) => `• ${formatDateTime(p.at)} — ${formatBRL(p.amountCents)} via ${PAYMENT_METHOD_LABEL[p.method]} (simulado)`), '',
     `Gerado em ${formatDateTime(nowISO())} pelo portal. Documento de demonstração: nenhum valor real foi cobrado.`,

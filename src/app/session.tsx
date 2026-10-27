@@ -5,10 +5,11 @@ import type { ID, Organization, PlatformRole, StaffUser, Unit, Person } from '@/
 import { can, scopeOf, allowedUnitIds, type AccessContext, type Action, type Resource } from '@/domain/permissions'
 import { db, evictOtherTenants, platformDb, useCollection, usePlatformCollection } from '@/data/store'
 
+/** `remote: true` = sessão autenticada no Supabase (dados reais via RLS); ausente = demonstração local. */
 export type DemoSession =
-  | { kind: 'staff'; tenantId: ID; userId: ID; unitId: ID | null; viewAs?: { userId: ID } }
-  | { kind: 'portal'; tenantId: ID; personId: ID; activePatientId?: ID }
-  | { kind: 'platform'; role: PlatformRole; userId: ID }
+  | { kind: 'staff'; tenantId: ID; userId: ID; unitId: ID | null; viewAs?: { userId: ID }; remote?: boolean }
+  | { kind: 'portal'; tenantId: ID; personId: ID; activePatientId?: ID; remote?: boolean }
+  | { kind: 'platform'; role: PlatformRole; userId: ID; remote?: boolean }
 
 const KEY = 'qlinic.session'
 const listeners = new Set<() => void>()
@@ -45,6 +46,13 @@ export function setSession(s: DemoSession | null) {
   listeners.forEach((l) => l())
 }
 export function getSession() { return current }
+
+/** Sair: sessão conectada encerra no servidor e remove dados reais da memória; demo só limpa a sessão local. */
+export async function logout() {
+  if (current?.remote) { const { signOut } = await import('@/data/supabase/connected'); await signOut() }
+  else setSession(null)
+}
+export function isRemoteSession() { return !!current?.remote }
 export function useSession(): DemoSession | null {
   return useSyncExternalStore((cb) => { listeners.add(cb); return () => listeners.delete(cb) }, () => current)
 }

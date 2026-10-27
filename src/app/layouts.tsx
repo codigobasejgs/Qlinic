@@ -3,7 +3,7 @@ import { Suspense, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router'
 import { Menu, Search, PanelLeftClose, PanelLeftOpen, LogOut, Eye, X, MoreHorizontal, Building2, Bell, HelpCircle } from 'lucide-react'
 import { STAFF_NAV, MASTER_NAV } from './nav'
-import { useTenant, setSession, useSession, getSession } from './session'
+import { useTenant, setSession, useSession, getSession, logout, isRemoteSession } from './session'
 import { resetDemo, useCollection, usePlatformCollection } from '@/data/store'
 import { clearSeedCaches } from '@/data/platformSeed'
 import { Button, Badge, Skeleton } from '@/ui/core'
@@ -20,7 +20,9 @@ export function PageFallback() {
 }
 
 export function DemoBanner() {
+  const session = useSession()
   const confirm = useConfirm()
+  if (session?.remote) return null // ambiente conectado: dados reais, sem faixa de demonstração
   const onReset = async () => {
     const r = await confirm({ title: 'Restaurar dados de demonstração?', body: 'Todas as alterações feitas nesta demonstração, em todas as clínicas fictícias, serão apagadas deste navegador. Esta ação não pode ser desfeita.', confirmLabel: 'Restaurar dados', danger: true })
     if (r.ok) { resetDemo(); clearSeedCaches(); setSession(null); location.assign('/demonstracao') }
@@ -97,7 +99,7 @@ export function StaffLayout() {
       ))}
     </nav>
   )
-  const exit = () => { setSession(null); navigate('/demonstracao') }
+  const exit = async () => { const remote = isRemoteSession(); await logout(); navigate(remote ? '/auth/login' : '/demonstracao') }
 
   return (
     <>
@@ -261,7 +263,7 @@ export function MasterLayout({ children }: { children?: ReactNode }) {
             <span className="tb-title">Super Admin</span>
             <div className="grow" />
             <ThemeToggle compact />
-            <Button variant="ghost" icon={<LogOut />} onClick={() => { setSession(null); navigate('/demonstracao') }}>Sair</Button>
+            <Button variant="ghost" icon={<LogOut />} onClick={async () => { const remote = isRemoteSession(); await logout(); navigate(remote ? '/auth/login' : '/demonstracao') }}>Sair</Button>
           </header>
           <main id="main" className="content" tabIndex={-1}><Suspense fallback={<PageFallback />}>{children ?? <Outlet />}</Suspense></main>
         </div>

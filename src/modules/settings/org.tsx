@@ -6,7 +6,7 @@ import { useTenant, useActor } from '@/app/session'
 import { useCollection } from '@/data/store'
 import { BASE_MODULES, MODULE_LABEL, SEGMENT_LABEL, type ModuleKey, type Organization, type Segment } from '@/domain/types'
 import { validateSlug } from '@/domain/tenancy'
-import { Alert, Badge, Button, Checkbox, Field, FileUpload, Input, Select, SimBadge, Textarea, useAction } from '@/ui'
+import { Alert, Badge, Button, Checkbox, demoText, Field, FileUpload, Input, isConnectedEnv, Select, SimBadge, Textarea, useAction } from '@/ui'
 import { maskCEP, maskCNPJ, maskPhone } from '@/lib/util'
 import { getProfile, planOf, saveProfile, updateOrg, validateDemoEmail, TIMEZONES } from './lib'
 import type { ClinicProfile } from './types'
@@ -40,14 +40,14 @@ export function OrgInfoForm({ onSaved, saveLabel = 'Salvar organização' }: { o
   const save = () => run(() => {
     const e: Record<string, string | null> = {
       name: f.name.trim().length < 3 ? 'Informe o nome comercial (mín. 3 caracteres).' : null,
-      document: f.document && f.document.replace(/\D/g, '').length !== 14 ? 'CNPJ incompleto (14 dígitos). Use um número fictício.' : null,
+      document: f.document && f.document.replace(/\D/g, '').length !== 14 ? demoText('CNPJ incompleto (14 dígitos). Use um número fictício.', 'CNPJ incompleto (14 dígitos).') : null,
       contactEmail: validateDemoEmail(f.contactEmail) ?? (!f.contactEmail.trim() ? 'Informe um e-mail de contato de exemplo.' : null),
       cep: p.address.cep && p.address.cep.replace(/\D/g, '').length !== 8 ? 'CEP deve ter 8 dígitos.' : null,
       phone: f.contactPhone && f.contactPhone.replace(/\D/g, '').length < 10 ? 'Telefone incompleto.' : null,
     }
     setErr(e)
     if (Object.values(e).some(Boolean)) throw new Error('Revise os campos destacados.')
-    updateOrg(t.org, { ...f, name: f.name.trim(), legalName: f.legalName.trim() || `${f.name.trim()} (fictícia)` }, actor, 'dados da organização')
+    updateOrg(t.org, { ...f, name: f.name.trim(), legalName: f.legalName.trim() || demoText(`${f.name.trim()} (fictícia)`, f.name.trim()) }, actor, 'dados da organização')
     saveProfile(t.org, { address: p.address, whatsapp: p.whatsapp, links: p.links, technicalResponsible: p.technicalResponsible, professionalInfo: p.professionalInfo })
     onSaved?.()
   }, 'Dados da organização salvos.')
@@ -57,8 +57,8 @@ export function OrgInfoForm({ onSaved, saveLabel = 'Salvar organização' }: { o
       <fieldset disabled={!editable} className="stack" style={{ border: 0, padding: 0 }}>
         <div className="form-grid">
           <Field label="Nome comercial" required error={err.name}><Input value={f.name} onChange={set('name')} autoComplete="organization" /></Field>
-          <Field label="Razão social (fictícia)"><Input value={f.legalName} onChange={set('legalName')} /></Field>
-          <Field label="CNPJ (fictício)" hint="Use um número de exemplo, ex.: 00.000.000/0001-00." error={err.document}><Input value={f.document} onChange={set('document')} mask={maskCNPJ} inputMode="numeric" /></Field>
+          <Field label={demoText('Razão social (fictícia)', 'Razão social')}><Input value={f.legalName} onChange={set('legalName')} /></Field>
+          <Field label={demoText('CNPJ (fictício)', 'CNPJ')} hint={demoText('Use um número de exemplo, ex.: 00.000.000/0001-00.', 'Ex.: 00.000.000/0001-00.')} error={err.document}><Input value={f.document} onChange={set('document')} mask={maskCNPJ} inputMode="numeric" /></Field>
           <Field label="Fuso horário padrão" hint="Cada unidade pode ter seu fuso."><Select value={f.timezone} onChange={set('timezone')}>{TIMEZONES.map((z) => <option key={z} value={z}>{z.replace('America/', '').replace('_', ' ')} ({z})</option>)}</Select></Field>
         </div>
         <fieldset className="stack">
@@ -85,7 +85,7 @@ export function OrgInfoForm({ onSaved, saveLabel = 'Salvar organização' }: { o
           <legend>Informações profissionais</legend>
           <div className="form-grid">
             <Field label="Responsável técnico"><Input value={p.technicalResponsible.name} onChange={(e) => setP({ ...p, technicalResponsible: { ...p.technicalResponsible, name: e.target.value } })} /></Field>
-            <Field label="Registro no conselho (fictício)"><Input value={p.technicalResponsible.council} onChange={(e) => setP({ ...p, technicalResponsible: { ...p.technicalResponsible, council: e.target.value } })} placeholder="CRO-SP 00000 (fictício)" /></Field>
+            <Field label={demoText('Registro no conselho (fictício)', 'Registro no conselho')}><Input value={p.technicalResponsible.council} onChange={(e) => setP({ ...p, technicalResponsible: { ...p.technicalResponsible, council: e.target.value } })} placeholder={demoText('CRO-SP 00000 (fictício)', 'CRO-SP 00000')} /></Field>
           </div>
           <Field label="Texto para cabeçalho/rodapé de documentos"><Textarea rows={3} value={p.professionalInfo} onChange={(e) => setP({ ...p, professionalInfo: e.target.value })} /></Field>
         </fieldset>
@@ -126,7 +126,7 @@ export function SegmentModulesForm({ onSaved }: { onSaved?: () => void }) {
             })}
           </div>
         </fieldset>
-        {plan && <p className="small muted">Módulos marcados como “fora do plano” ficam habilitados nesta demonstração; em produção dependeriam de upgrade aprovado pela Qlinic.</p>}
+        {plan && <p className="small muted">{demoText('Módulos marcados como “fora do plano” ficam habilitados nesta demonstração; em produção dependeriam de upgrade aprovado pela Qlinic.', 'Módulos marcados como “fora do plano” estão habilitados no momento; dependem de upgrade aprovado pela Qlinic.')}</p>}
       </fieldset>
       {editable && <SaveBar><Button type="submit" variant="primary">Salvar segmento e módulos</Button></SaveBar>}
     </form>
@@ -233,9 +233,9 @@ export function BankDemoForm() {
   useCollection(t.tenantId, 'clinicProfile')
   const [b, setB] = useState(() => getProfile(t.org).bank)
   const save = () => run(() => {
-    if (/\d{5,}/.test(b.account.replace(/\D/g, '')) && !/^0+$/.test(b.account.replace(/\D/g, '').slice(0, 3))) throw new Error('Use apenas números fictícios (comece a conta com 000).')
+    if (!isConnectedEnv() && /\d{5,}/.test(b.account.replace(/\D/g, '')) && !/^0+$/.test(b.account.replace(/\D/g, '').slice(0, 3))) throw new Error('Use apenas números fictícios (comece a conta com 000).')
     saveProfile(t.org, { bank: b })
-  }, 'Conta recebedora demonstrativa salva.')
+  }, demoText('Conta recebedora demonstrativa salva.', 'Conta recebedora salva (uso informativo; pagamentos ainda não integrados).'))
   const f = (k: keyof typeof b) => (e: { target: { value: string } }) => setB({ ...b, [k]: e.target.value })
   return (
     <form className="stack" onSubmit={(e) => { e.preventDefault(); save() }}>

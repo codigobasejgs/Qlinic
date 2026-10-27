@@ -5,7 +5,7 @@ import { Plus } from 'lucide-react'
 import { db, usePlatformCollection, useStoreVersion } from '@/data/store'
 import { SEGMENT_LABEL, MODULE_LABEL, type Organization, type Segment, type TenantStatus } from '@/domain/types'
 import { slugify, validateSlug } from '@/domain/tenancy'
-import { Alert, Badge, Button, ButtonLink, DescList, EmptyState, Field, Input, PageHeader, Progress, Section, Select, SimBadge, Tabs, TabPanel, Timeline } from '@/ui/core'
+import { Alert, Badge, Button, ButtonLink, DescList, demoText, EmptyState, Field, Input, PageHeader, Progress, Section, Select, SimBadge, Tabs, TabPanel, Timeline } from '@/ui/core'
 import { Dialog, useAction, useConfirm } from '@/ui/overlay'
 import { DataTable, type Column } from '@/ui/table'
 import { formatBRL } from '@/lib/money'
@@ -169,12 +169,12 @@ function TenantDetailBody({ org: o }: { org: Organization }) {
           <div className="stack">
             <DescList items={[
               ['Status', <Badge tone={ORG_STATUS[o.status][1]}>{ORG_STATUS[o.status][0]}</Badge>], ['Plano', `${plan?.name ?? o.planId} (v${plan?.version ?? '—'})`], ['Razão social', o.legalName],
-              ['CNPJ (fictício)', o.document || '—'], ['Contato', o.contactEmail], ['Telefone', o.contactPhone || '—'],
+              [demoText('CNPJ (fictício)', 'CNPJ'), o.document || '—'], ['Contato', o.contactEmail], ['Telefone', o.contactPhone || '—'],
               ['Unidades', units.length], ['Usuários ativos', staffCount], ['Pacientes cadastrados (contagem)', patientCount],
               ['Fuso', o.timezone], ['Cliente desde', formatCivil(o.createdAt.slice(0, 10))], ['Tipo', o.demo ? 'Clínica de demonstração' : o.sandbox ? 'Criada na demonstração' : 'Somente métricas'],
             ]} />
             <Section title="Unidades (dados não clínicos)">
-              {units.length ? <ul className="stack" style={{ '--gap': '6px', margin: 0, paddingLeft: 18 } as React.CSSProperties}>{units.map((un) => <li key={un.id}>{un.name} <span className="small muted">· {un.timezone}</span></li>)}</ul> : <p className="small muted">Sem unidades carregadas para este contratante na demonstração.</p>}
+              {units.length ? <ul className="stack" style={{ '--gap': '6px', margin: 0, paddingLeft: 18 } as React.CSSProperties}>{units.map((un) => <li key={un.id}>{un.name} <span className="small muted">· {un.timezone}</span></li>)}</ul> : <p className="small muted">{demoText('Sem unidades carregadas para este contratante na demonstração.', 'Sem unidades carregadas para este contratante.')}</p>}
             </Section>
             <Section title="Responsáveis">
               <ul className="stack" style={{ '--gap': '6px', margin: 0, paddingLeft: 18 } as React.CSSProperties}>

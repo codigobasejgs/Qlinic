@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useTenant } from '@/app/session'
+import { useEffect, useState } from 'react'
+import { useTenant, isRemoteSession } from '@/app/session'
 import { db, useCollection } from '@/data/store'
 import { QRCode } from '@/modules/scheduling/qr'
 import { Alert, Badge, Button, Field, Input, Section, Select, SimBadge, Textarea, Timeline, useAction } from '@/ui'
@@ -9,6 +9,55 @@ import { createHandoff } from './engine'
 import { detectInjection } from './rules'
 import { IntegrationBadge } from './ui'
 import { updateIntegration } from './comm-integrations'
+
+/** Ambiente conectado: instância real da Evolution por clínica, operada pelo servidor (a chave nunca chega ao navegador). */
+function WhatsAppConnected({ canManage }: { canManage: boolean }) {
+  const t = useTenant()
+  const [state, setState] = useState<{ status: string; instance?: string; qrBase64?: string | null; code?: string | null; pairingCode?: string | null } | null>(null)
+  const [busy, setBusy] = useState<string | null>(null)
+  const [err, setErr] = useState<string | null>(null)
+  const call = async (action: 'status' | 'connect' | 'logout') => {
+    setBusy(action); setErr(null)
+    try {
+      const { supabase } = await import('@/data/supabase/client')
+      const { data, error } = await supabase().functions.invoke('whatsapp', { body: { tenantId: t.tenantId, action } })
+      if (error) {
+        const ctx = (error as { context?: Response }).context
+        const msg = ctx ? ((await ctx.json().catch(() => null)) as { error?: string } | null)?.error : null
+        throw new Error(msg ?? 'Falha ao falar com o servidor de WhatsApp.')
+      }
+      setState(data)
+    } catch (e) { setErr(e instanceof Error ? e.message : 'Erro') } finally { setBusy(null) }
+  }
+  useEffect(() => { void call('status') }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  const label: Record<string, string> = { conectada: 'Conectada', configurando: 'Aguardando leitura do QR', desconectada: 'Desconectada', erro: 'Erro' }
+  return <div className="stack">
+    <Alert title="WhatsApp via Evolution API">Transporte não oficial (Evolution/Baileys), diferente da API oficial da Meta: status de leitura e entrega podem não estar disponíveis. Mensagens só são enviadas para quem autorizou WhatsApp, sem conteúdo clínico.</Alert>
+    <Section title="Instância desta clínica" actions={state && <Badge tone={state.status === 'conectada' ? 'success' : state.status === 'erro' ? 'danger' : 'warning'}>{label[state.status] ?? state.status}</Badge>}>
+      <div className="stack" aria-busy={!!busy}>
+        {err && <Alert tone="danger">{err}</Alert>}
+        <p className="small muted">Instância: <span className="mono">{state?.instance ?? '…'}</span>. A chave de acesso fica apenas no servidor.</p>
+        <div className="row">
+          <Button onClick={() => call('status')} loading={busy === 'status'}>Atualizar status</Button>
+          {canManage && state?.status !== 'conectada' && <Button variant="primary" onClick={() => call('connect')} loading={busy === 'connect'}>Conectar aparelho</Button>}
+          {canManage && state?.status === 'conectada' && <Button variant="danger" onClick={() => call('logout')} loading={busy === 'logout'}>Desconectar</Button>}
+        </div>
+        {state?.status === 'configurando' && (state.qrBase64 || state.code) && (
+          <div className="eng-qr">
+            {state.qrBase64 ? <img src={state.qrBase64.startsWith('data:') ? state.qrBase64 : `data:image/png;base64,${state.qrBase64}`} width={220} height={220} alt="QR Code para conectar o WhatsApp da clínica" /> : <QRCode value={state.code!} size={220} label="QR Code para conectar o WhatsApp da clínica" />}
+            <ol className="small" style={{ margin: 0, paddingLeft: 20 }}>
+              <li>No celular da clínica, abra o WhatsApp → Aparelhos conectados.</li>
+              <li>Toque em Conectar um aparelho e leia este código.</li>
+              <li>Depois, clique em Atualizar status.</li>
+            </ol>
+            {state.pairingCode && <p className="small">Código de pareamento: <strong className="mono">{state.pairingCode}</strong></p>}
+          </div>
+        )}
+        {!canManage && <p className="small muted">Gerenciar a conexão exige permissão de integrações.</p>}
+      </div>
+    </Section>
+  </div>
+}
 
 export function WhatsAppTab() {
   const t = useTenant()
@@ -40,6 +89,7 @@ export function WhatsAppTab() {
     db.update(t.tenantId, 'handoffTasks', task.id, { status: 'em_andamento', assigneeId: s.id, assigneeName: s.name })
     db.update(t.tenantId, 'waConversations', c.id, { status: 'em_atendimento_humano', handoff: { toId: s.id, toName: s.name, at: nowISO(), reason: 'Transferência manual' }, messages: [...c.messages, { id: uid('wam_'), at: nowISO(), from: 'sistema', text: `Conversa transferida para ${s.name}.` }] })
   }, 'Conversa transferida; tarefa atribuída ao responsável.')
+  if (isRemoteSession()) return <WhatsAppConnected canManage={connect} />
   return <div className="stack">
     <Alert title="Evolution API — transporte demonstrativo">Modo/transporte Evolution ≠ API oficial Meta. Não há garantia de transporte oficial para qualquer instalação. Nenhum WhatsApp real está conectado.</Alert>
     <SimBadge />

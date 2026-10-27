@@ -40,7 +40,8 @@ export const MATRIX: Record<TenantRole, RoleMatrix> = {
     estoque: RW, compras: { ...RW, approve: true }, relatorios: R, configuracoes: { read: true, update: true }, equipe: R, comunicacao: RW, ia: R, auditoria: R,
   },
   reception: {
-    agenda: ALL, recepcao: ALL, pacientes: RW, documentos: { read: true }, orcamentos: { read: true, create: true }, crm: RW,
+    // sem 'approve' na agenda: encaixe com conflito reconhecido é decisão da gestão
+    agenda: { read: true, create: true, update: true, delete: true, export: true }, recepcao: ALL, pacientes: RW, documentos: { read: true }, orcamentos: { read: true, create: true }, crm: RW,
     caixa: RW, financeiro: { read: true, create: true }, comunicacao: { read: true, create: true }, ia: R,
   },
   professional: {

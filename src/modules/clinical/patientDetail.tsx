@@ -9,7 +9,7 @@ import { db, useCollection } from '@/data/store'
 import { audit, chargeBalance, patientRepo } from '@/data/repositories'
 import { canSeeDocument, canSeeRecord, visibleClinicalAlerts } from '@/domain/access'
 import {
-  Alert, Avatar, Badge, Button, ButtonLink, Checkbox, DescList, Dialog, EmptyState, Field, FileUpload, Input, Kpi, PageHeader, Section, Select, Tabs, TabPanel, Textarea, Timeline, useAction, useConfirm, useLookup,
+  Alert, Avatar, Badge, Button, ButtonLink, Checkbox, DemoOnly, demoText, DescList, Dialog, EmptyState, Field, FileUpload, Input, Kpi, PageHeader, Section, Select, Tabs, TabPanel, Textarea, Timeline, useAction, useConfirm, useLookup,
 } from '@/ui'
 import { formatBRL } from '@/lib/money'
 import { formatCivil, formatDateTime, todayCivil } from '@/lib/dates'
@@ -333,15 +333,15 @@ function FilesTab({ p }: { p: Patient }) {
           <div className="form-grid">
             <Field label="Categoria"><Select value={cat} onChange={(e) => setCat(e.target.value as FileAsset['category'])}>{Object.entries(FILE_CATEGORY_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</Select></Field>
           </div>
-          <div className="row"><Checkbox label="Acesso restrito à equipe clínica" checked={restricted} onChange={(e) => setRestricted(e.target.checked)} /><Checkbox label="Simular falha no envio" hint="Demonstração de erro" checked={fail} onChange={(e) => setFail(e.target.checked)} /></div>
-          <FileUpload accept={FILE_ACCEPT} maxMb={4} simulateFailure={fail} label="Selecionar arquivo" hint="PNG, JPEG, WebP ou PDF. Máx. 4 MB. Arquivos fictícios apenas." onFile={(f) => run(() => addFile(t.tenantId, p.id, f, cat, restricted, actor), `Arquivo "${f.name}" enviado.`)} />
+          <div className="row"><Checkbox label="Acesso restrito à equipe clínica" checked={restricted} onChange={(e) => setRestricted(e.target.checked)} /><DemoOnly><Checkbox label="Simular falha no envio" hint="Demonstração de erro" checked={fail} onChange={(e) => setFail(e.target.checked)} /></DemoOnly></div>
+          <FileUpload accept={FILE_ACCEPT} maxMb={4} simulateFailure={fail} label="Selecionar arquivo" hint={demoText('PNG, JPEG, WebP ou PDF. Máx. 4 MB. Arquivos fictícios apenas.', 'PNG, JPEG, WebP ou PDF. Máx. 4 MB.')} onFile={(f) => run(() => addFile(t.tenantId, p.id, f, cat, restricted, actor), `Arquivo "${f.name}" enviado.`)} />
         </Section>
       )}
       <div className="row between">
         <Field label="Filtrar categoria"><Select value={filter} onChange={(e) => setFilter(e.target.value as typeof filter)}><option value="">Todas</option>{Object.entries(FILE_CATEGORY_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</Select></Field>
         <span className="small muted" aria-live="polite">{shown.length} arquivo(s)</span>
       </div>
-      {shown.length === 0 ? <EmptyState title="Nenhum arquivo" icon={<FileUp aria-hidden="true" />}>Envie exames, imagens ou documentos (fictícios).</EmptyState> : (
+      {shown.length === 0 ? <EmptyState title="Nenhum arquivo" icon={<FileUp aria-hidden="true" />}>{demoText('Envie exames, imagens ou documentos (fictícios).', 'Envie exames, imagens ou documentos.')}</EmptyState> : (
         <ul className="gallery">
           {shown.map((f) => (
             <li key={f.id}>
@@ -366,7 +366,7 @@ function FileViewer({ file, onClose, canReplace, onReplace }: { file: FileAsset;
     <Dialog open onClose={onClose} size="lg" title={file.name} description={`${FILE_CATEGORY_LABEL[file.category]} · ${(file.sizeBytes / 1024).toFixed(0)} KB · ${file.mime}`}>
       <div className="stack">
         <Field label="Versão"><Select value={ver} onChange={(e) => setVer(Number(e.target.value))}>{[...file.versions].reverse().map((x) => <option key={x.version} value={x.version}>v{x.version} · {formatDateTime(x.at)} · {x.by}{x.note ? ` · ${x.note}` : ''}</option>)}</Select></Field>
-        {v?.dataUrl && file.mime.startsWith('image/') && v.dataUrl.startsWith('data:image/') ? <img src={v.dataUrl} alt={`${file.name}, versão ${v.version}`} className="file-preview" /> : <p className="muted small">Pré-visualização de PDF não incorporada nesta demonstração (o arquivo original está preservado localmente).</p>}
+        {v?.dataUrl && file.mime.startsWith('image/') && v.dataUrl.startsWith('data:image/') ? <img src={v.dataUrl} alt={`${file.name}, versão ${v.version}`} className="file-preview" /> : <p className="muted small">{demoText('Pré-visualização de PDF não incorporada nesta demonstração (o arquivo original está preservado localmente).', 'Pré-visualização de PDF não incorporada (o arquivo original está preservado).')}</p>}
         {canReplace && (
           <fieldset><legend>Substituir (cria nova versão)</legend>
             <Field label="Motivo da substituição" required><Input value={note} onChange={(e) => setNote(e.target.value)} /></Field>

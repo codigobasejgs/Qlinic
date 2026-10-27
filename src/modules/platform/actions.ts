@@ -1,4 +1,5 @@
 // Casos de uso do Super Admin. TODA alteração registra platformAudit. Fluxos externos = simulados.
+import { isConnectedEnv } from '@/lib/env'
 import '@/domain/platform'
 import { platformDb } from '@/data/store'
 import { createTrialOrganization } from '@/domain/tenancy'
@@ -30,7 +31,7 @@ function updateSub(id: ID, actor: Actor, event: string, patch: (s: Subscription)
 export function createTenant(input: { name: string; segment: Segment; slug?: string; ownerName?: string; trialDays: number; city?: string; contactEmail?: string }, actor: Actor) {
   if (!Number.isInteger(input.trialDays) || input.trialDays < 1 || input.trialDays > 90) throw new Error('Duração do teste: 1 a 90 dias.')
   const email = input.contactEmail?.trim()
-  if (email && !/^[^@\s]+@[^@\s]+\.(exemplo|test|example)(\.[a-z]+)?$/i.test(email)) throw new Error('Use um e-mail fictício (.exemplo ou .test) na demonstração.')
+  if (email && !isConnectedEnv() && !/^[^@\s]+@[^@\s]+\.(exemplo|test|example)(\.[a-z]+)?$/i.test(email)) throw new Error('Use um e-mail fictício (.exemplo ou .test) na demonstração.')
   if (!['odontologia', 'medicina', 'veterinaria', 'estetica', 'psicologia', 'fisioterapia', 'nutricao'].includes(input.segment)) throw new Error('Segmento inválido.')
   // Materializa seeds antes da criação para não gerar uma segunda assinatura do novo tenant.
   platformDb.list('subscriptions')
@@ -412,7 +413,8 @@ export function addChangelog(version: string, items: string[], a: Actor) {
 export function createPlatformUser(input: { name: string; email: string; role: PlatformRole }, a: Actor) {
   if (input.name.trim().length < 3) throw new Error('Informe o nome.')
   const email = input.email.trim().toLowerCase()
-  if (!/^[^@\s]+@[^@\s]+\.(exemplo|test)(\.[a-z]+)?$/.test(email)) throw new Error('Use e-mail fictício (.exemplo ou .test).')
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) throw new Error('E-mail inválido.')
+  if (!isConnectedEnv() && !/^[^@\s]+@[^@\s]+\.(exemplo|test)(\.[a-z]+)?$/.test(email)) throw new Error('Use e-mail fictício (.exemplo ou .test).')
   if (platformDb.list('platformUsers').some((u) => u.email === email)) throw new Error('E-mail já cadastrado.')
   const id = uid('pu_')
   platformDb.insert('platformUsers', { id, name: input.name.trim(), email, role: input.role, active: true })

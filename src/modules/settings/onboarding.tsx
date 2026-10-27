@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { useActor, useTenant } from '@/app/session'
 import { useCollection } from '@/data/store'
-import { Alert, Badge, Button, PageHeader } from '@/ui'
+import { Alert, Badge, Button, demoText, PageHeader } from '@/ui'
 import { cx } from '@/lib/util'
 import { updateOrg } from './lib'
 import { OrgInfoForm, SegmentModulesForm, PublicPageForm, CommunicationProfileForm, BankDemoForm } from './org'
@@ -71,7 +71,7 @@ export function OnboardingPage() {
   }
 
   const checklist = [
-    { label: 'Organização: nome, CNPJ fictício e contato', done: t.org.name.length > 2 && t.org.document.replace(/\D/g, '').length === 14 && !!t.org.contactEmail, step: 1 },
+    { label: demoText('Organização: nome, CNPJ fictício e contato', 'Organização: nome, CNPJ e contato'), done: t.org.name.length > 2 && t.org.document.replace(/\D/g, '').length === 14 && !!t.org.contactEmail, step: 1 },
     { label: 'Segmento e módulos revisados', done: saved.includes(2), step: 2 },
     { label: 'Unidade com horário de funcionamento', done: units.some((u) => Object.values(u.hours).some((h) => h.length)), step: 3 },
     { label: 'Salas, cadeiras ou equipamentos cadastrados', done: resources.length > 0, step: 3 },
@@ -100,7 +100,7 @@ export function OnboardingPage() {
         </Alert>
       )}
 
-      {t.org.sandbox && !t.org.onboarding?.completed && <Alert tone="info" title="Clínica criada na demonstração">Os cadastros começam vazios. Preencha as etapas na ordem que preferir; o checklist final indica o que falta.</Alert>}
+      {t.org.sandbox && !t.org.onboarding?.completed && <Alert tone="info" title={demoText('Clínica criada na demonstração', 'Clínica recém-criada')}>Os cadastros começam vazios. Preencha as etapas na ordem que preferir; o checklist final indica o que falta.</Alert>}
       <nav aria-label="Progresso da configuração inicial">
         <ol className="steps">
           {STEPS.map((s) => {

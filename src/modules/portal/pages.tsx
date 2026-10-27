@@ -8,7 +8,7 @@ import {
 } from 'lucide-react'
 import './styles.css'
 import { DemoBanner } from '@/app/layouts'
-import { setSession } from '@/app/session'
+import { logout } from '@/app/session'
 import { db, useCollection } from '@/data/store'
 import type { Appointment, Charge, ClinicDocument, ID, Organization, Service } from '@/domain/types'
 import { APPOINTMENT_STATUS_LABEL } from '@/domain/types'
@@ -16,7 +16,7 @@ import { changeAppointmentStatus, createAppointment, issueCheckInToken, reschedu
 import { getPolicies } from '@/domain/settings'
 import type { Slot } from '@/domain/scheduling'
 import { billingRepo, chargeBalance } from '@/data/repositories'
-import { Alert, Badge, Button, ButtonLink, EmptyState, Field, Select, SimBadge, Textarea, Tabs, type Tone } from '@/ui/core'
+import { Alert, Badge, Button, ButtonLink, DemoOnly, EmptyState, Field, Select, SimBadge, Textarea, Tabs, type Tone } from '@/ui/core'
 import { Dialog, useAction, useConfirm } from '@/ui/overlay'
 import { DemoPaper, SignaturePad } from '@/ui/widgets'
 import { ClinicLogo, QlinicLogo, ThemeToggle, useDocumentBrand } from '@/ui/brand'
@@ -56,7 +56,7 @@ export function PortalLayout() {
   useDocumentBrand({ title: `${org.name} · Portal` })
   const href = (to: string) => (to ? `${base}/${to}` : base)
   const isActive = (to: string) => (to ? loc.pathname.startsWith(`${base}/${to}`) : loc.pathname === base || loc.pathname === `${base}/`)
-  const exit = () => { setSession(null); navigate(`/c/${org.slug}`) }
+  const exit = async () => { await logout(); navigate(`/c/${org.slug}`) }
   const vet = org.segment === 'veterinaria'
   return (
     <div className="pt-shell">
@@ -92,7 +92,7 @@ export function PortalLayout() {
         {active ? <Outlet key={`${org.id}:${person.id}:${active.patient.id}`} /> : <EmptyState title="Nenhum paciente vinculado">Seu cadastro ainda não está vinculado a um paciente {vet ? 'ou animal ' : ''}nesta clínica. Fale com a recepção.</EmptyState>}
       </main>
       <footer className="pt-footer">
-        <span>{org.name} · dados fictícios</span>
+        <span>{org.name}<DemoOnly> · dados fictícios</DemoOnly></span>
         <span className="row" style={{ '--gap': '6px' } as React.CSSProperties}>plataforma <QlinicLogo height={14} decorative /><span className="sr-only">Qlinic</span></span>
       </footer>
       <nav className="bottom-nav" aria-label="Navegação rápida">

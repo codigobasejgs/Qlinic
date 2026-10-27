@@ -13,3 +13,6 @@ qa/e2e-results.json
 .vercel
 # Pacote original (já extraído nesta pasta)
 Qlinic_Pacote_Inicial_Com_Prompt.zip
+
+# credenciais locais
+Documentação.txt

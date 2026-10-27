@@ -5,7 +5,7 @@ import { Bell, BellOff, CheckCircle2, Download, FileSignature, Laptop, MessageSq
 import { db, useCollection } from '@/data/store'
 import type { ID, Person } from '@/domain/types'
 import type { FormField, FormResponse } from '@/domain/modules'
-import { Alert, Badge, Button, Checkbox, EmptyState, Field, Input, Select, Textarea } from '@/ui/core'
+import { Alert, Badge, Button, Checkbox, demoText, EmptyState, Field, Input, Select, Textarea } from '@/ui/core'
 import { Dialog, useAction } from '@/ui/overlay'
 import { pushState, requestPushPermission, useConfirmLeave, useNetworkStatus, type PushState } from '@/pwa/client'
 import { formatCivil, formatDateTime, hhmmToMinutes, minutesToHHMM, nowISO, todayCivil } from '@/lib/dates'
@@ -309,7 +309,7 @@ export function PortalPreferencesPage() {
       <Button variant="primary" icon={<Save />} onClick={save} style={{ alignSelf: 'flex-start' }} data-tour="primary-action">Salvar preferências</Button>
       <section className="pt-card" aria-labelledby="push-h">
         <div className="row between"><h2 id="push-h" style={{ fontSize: 16 }}>Push neste dispositivo</h2><Badge tone={PUSH_LABEL[push][1]}>{PUSH_LABEL[push][0]}</Badge></div>
-        <p className="small muted">A permissão só é pedida quando você clicar. A entrega real de push depende de assinatura no servidor da clínica (etapa futura) e das regras do seu sistema; nada é enviado nesta demonstração.</p>
+        <p className="small muted">A permissão só é pedida quando você clicar. A entrega real de push depende de assinatura no servidor da clínica (etapa futura) e das regras do seu sistema; {demoText('nada é enviado nesta demonstração.', 'por enquanto nenhuma notificação é enviada.')}</p>
         {push === 'padrao' && <Button icon={<Bell />} loading={asking} onClick={ask} style={{ alignSelf: 'flex-start' }}>Permitir notificações</Button>}
         {push === 'negado' && <p className="small"><BellOff size={16} aria-hidden="true" style={{ display: 'inline', verticalAlign: 'middle' }} /> Para reativar, libere as notificações deste site nas configurações do navegador.</p>}
         {push === 'concedido' && <p className="small"><CheckCircle2 size={16} aria-hidden="true" style={{ display: 'inline', verticalAlign: 'middle' }} /> Permissão concedida. Assinatura remota: pendente de backend.</p>}
@@ -345,7 +345,7 @@ export function PortalProfilePage() {
       <section className="pt-card">
         <h2 style={{ fontSize: 16 }}>Seus dados</h2>
         <dl className="grid grid-3" style={{ margin: 0, '--gap': '12px' } as React.CSSProperties}>
-          {([['Nome', person.name], ['CPF (fictício)', person.cpf], ['Nascimento', formatCivil(person.birthDate)], ['Telefone', person.phone], ['E-mail', person.email]] as const).map(([k, v]) => <div key={k}><dt className="small muted">{k}</dt><dd style={{ margin: 0 }} className="strong">{v ?? '—'}</dd></div>)}
+          {([['Nome', person.name], [demoText('CPF (fictício)', 'CPF'), person.cpf], ['Nascimento', formatCivil(person.birthDate)], ['Telefone', person.phone], ['E-mail', person.email]] as const).map(([k, v]) => <div key={k}><dt className="small muted">{k}</dt><dd style={{ margin: 0 }} className="strong">{v ?? '—'}</dd></div>)}
         </dl>
         <p className="small muted">Para corrigir dados cadastrais, solicite atendimento: a recepção confere e atualiza.</p>
       </section>
@@ -364,7 +364,7 @@ export function PortalProfilePage() {
       </section>
       <section className="pt-card">
         <h2 style={{ fontSize: 16 }}>Sessões e dispositivos</h2>
-        <div className="row"><Laptop aria-hidden="true" /><span className="grow"><strong>{browser} — este navegador</strong><br /><span className="small muted">Sessão de demonstração ativa agora</span></span><Badge tone="success">Atual</Badge></div>
+        <div className="row"><Laptop aria-hidden="true" /><span className="grow"><strong>{browser} — este navegador</strong><br /><span className="small muted">{demoText('Sessão de demonstração ativa agora', 'Sessão ativa agora')}</span></span><Badge tone="success">Atual</Badge></div>
         <p className="small muted">Lista de dispositivos e encerramento remoto de sessões dependem da autenticação no servidor (etapa futura). Para sair deste navegador, use “Sair”.</p>
       </section>
       <section className="pt-card">

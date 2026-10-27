@@ -1,5 +1,6 @@
 // Regras puras do módulo de configurações (sem React, sem window): herança de políticas, perfil da clínica,
 // limites do plano e verificação de marca. Testado em settings.test.ts.
+import { isConnectedEnv } from '@/lib/env'
 import type { ID, Organization } from '@/domain/types'
 import type { PlanLimits } from '@/domain/platform'
 import { getPolicies, type ClinicPolicies, type ClinicSettings } from '@/domain/settings'
@@ -150,7 +151,8 @@ export function validateDemoEmail(email: string): string | null {
   const e = email.trim().toLowerCase()
   if (!e) return null
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) return 'E-mail inválido.'
-  if (!/\.(test|exemplo)$/.test(e)) return 'Na demonstração use um domínio de exemplo terminado em .exemplo.test.'
+  // conectado aceita e-mail real; demonstração exige domínio de exemplo (evita contato acionável)
+  if (!isConnectedEnv() && !/\.(test|exemplo)$/.test(e)) return 'Na demonstração use um domínio de exemplo terminado em .exemplo.test.'
   return null
 }
 

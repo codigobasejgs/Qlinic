@@ -30,19 +30,29 @@ export function TenantNotFound() {
   )
 }
 
+// Resolução do tenant acontece DEPOIS de ModulesReady: na sessão conectada, organizações vêm do servidor.
 export function StaffGate() {
+  return <ModulesReady><StaffResolved /></ModulesReady>
+}
+function StaffResolved() {
   const { tenantSlug } = useParams()
   const org = useOrgBySlug(tenantSlug)
   if (!org) return <TenantNotFound />
-  return <ModulesReady><TenantProvider key={org.id} org={org}><StaffLayout /></TenantProvider></ModulesReady>
+  return <TenantProvider key={org.id} org={org}><StaffLayout /></TenantProvider>
 }
 
 /** Ambiente público da clínica (página, agendamento, totem, painel, proposta). Aplica marca da clínica. */
 export function ClinicGate() {
+  return <ModulesReady><ClinicResolved /></ModulesReady>
+}
+function ClinicResolved() {
   const { tenantSlug } = useParams()
   const org = useOrgBySlug(tenantSlug)
-  if (!org || !org.publicPage.enabled || org.status === 'cancelled') return <TenantNotFound />
-  return <ModulesReady><ClinicBrand org={org}><Suspense fallback={<PageFallback />}><Outlet context={org} /></Suspense></ClinicBrand></ModulesReady>
+  const session = useSession()
+  // portal conectado: org vem do servidor mesmo sem página pública habilitada
+  const portalOwn = session?.kind === 'portal' && session.remote && org && session.tenantId === org.id
+  if (!org || (!org.publicPage.enabled && !portalOwn) || org.status === 'cancelled') return <TenantNotFound />
+  return <ClinicBrand org={org}><Suspense fallback={<PageFallback />}><Outlet context={org} /></Suspense></ClinicBrand>
 }
 function ClinicBrand({ org, children }: { org: Organization; children: React.ReactNode }) {
   useTenantBrand(org)

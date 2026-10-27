@@ -1,0 +1,15 @@
+// Publica no Supabase os planos (catálogo SaaS) para que o modo conectado tenha planos/limites reais.
+// Não cria clínicas fictícias no banco: a demonstração continua 100% local; o banco recebe só clínicas reais.
+// Uso: node scripts/ops/seed-demo.mjs
+import { createClient } from '@supabase/supabase-js'
+import { loadEnv } from './env.mjs'
+const E = loadEnv()
+const admin = createClient(E.VITE_SUPABASE_URL, E.SUPABASE_SERVICE_ROLE_KEY, { auth: { persistSession: false } })
+const plans = [
+  { id: 'plan_essencial', name: 'Essencial', description: 'Para consultórios e clínicas pequenas.', prices: { mensal: 24900, trimestral: 69900, anual: 249000 }, limits: { users: 5, professionals: 3, units: 1, storageGb: 20, messagesMonth: 1000, aiCreditsMonth: 200 }, modules: ['agenda', 'recepcao', 'pacientes', 'prontuario', 'documentos', 'orcamentos', 'financeiro', 'portal', 'pwa', 'comunicacao', 'relatorios', 'importacao'], overage: { messageCents: 12, storageGbCents: 150, aiCreditCents: 8, extraProfessionalCents: 4900 }, upgradeRule: 'imediato_pro_rata', downgradeRule: 'proximo_ciclo', active: true, version: 1 },
+  { id: 'plan_pro', name: 'Profissional', description: 'Clínicas com equipe e módulos de especialidade.', prices: { mensal: 49900, trimestral: 139900, anual: 499000 }, limits: { users: 20, professionals: 10, units: 2, storageGb: 100, messagesMonth: 5000, aiCreditsMonth: 1500 }, modules: ['agenda', 'recepcao', 'pacientes', 'prontuario', 'documentos', 'orcamentos', 'financeiro', 'portal', 'pwa', 'comunicacao', 'relatorios', 'importacao', 'crm', 'comissoes', 'estoque', 'compras', 'convenios', 'automacoes', 'ia', 'multidisciplinar', 'odontologia', 'medicina', 'veterinaria', 'estetica', 'psicologia', 'fisioterapia', 'nutricao'], overage: { messageCents: 10, storageGbCents: 120, aiCreditCents: 6, extraProfessionalCents: 3900 }, upgradeRule: 'imediato_pro_rata', downgradeRule: 'proximo_ciclo', active: true, version: 1 },
+  { id: 'plan_rede', name: 'Rede', description: 'Redes multiunidade com gestão centralizada.', prices: { mensal: 129900, trimestral: 369900, anual: 1299000 }, limits: { users: 80, professionals: 40, units: 10, storageGb: 500, messagesMonth: 20000, aiCreditsMonth: 6000 }, modules: ['agenda', 'recepcao', 'pacientes', 'prontuario', 'documentos', 'orcamentos', 'financeiro', 'portal', 'pwa', 'comunicacao', 'relatorios', 'importacao', 'crm', 'comissoes', 'estoque', 'compras', 'convenios', 'automacoes', 'ia', 'multidisciplinar', 'odontologia', 'medicina', 'veterinaria', 'estetica', 'psicologia', 'fisioterapia', 'nutricao'], overage: { messageCents: 8, storageGbCents: 100, aiCreditCents: 5, extraProfessionalCents: 2900 }, upgradeRule: 'imediato_pro_rata', downgradeRule: 'proximo_ciclo', active: true, version: 1 },
+]
+const { error } = await admin.from('platform_documents').upsert(plans.map((p) => ({ collection: 'plans', id: p.id, data: p })), { onConflict: 'collection,id', ignoreDuplicates: true })
+if (error) { console.error(error.message); process.exit(1) }
+console.log(`planos publicados (existentes preservados): ${plans.map((p) => p.id).join(', ')}`)

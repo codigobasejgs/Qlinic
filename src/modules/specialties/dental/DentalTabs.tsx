@@ -5,7 +5,7 @@ import type { FileAsset, StatusChange } from '@/domain/types'
 import { useActor, useTenant } from '@/app/session'
 import { db, useCollection } from '@/data/store'
 import { audit } from '@/data/repositories'
-import { Alert, Badge, Button, DataTable, Dialog, Field, FileUpload, Input, Kpi, Section, Select, SimBadge, Textarea, Timeline, useAction, useConfirm, useLookup, type Column, type Tone } from '@/ui'
+import { Alert, Badge, Button, DataTable, demoText, Dialog, Field, FileUpload, Input, Kpi, Section, Select, SimBadge, Textarea, Timeline, useAction, useConfirm, useLookup, type Column, type Tone } from '@/ui'
 import { addDaysCivil, formatCivil, formatDateTime, nowISO, todayCivil } from '@/lib/dates'
 import { formatBRL, parseBRL } from '@/lib/money'
 import { uid } from '@/lib/util'
@@ -367,7 +367,7 @@ export function ImagesTab({ patientId }: { patientId: string }) {
     if (n !== undefined && !isValidTooth(n)) throw new Error('Dente inválido (FDI).')
     if (date > todayCivil()) throw new Error('Data da imagem não pode ser futura.')
     const fid = uid('file_')
-    const f: FileAsset = { id: fid, tenantId: t.tenantId, createdAt: nowISO(), patientId, category: kind, name: u.name, mime: u.mime, sizeBytes: u.size, versions: [{ version: 1, at: nowISO(), by: actor.id, dataUrl: u.dataUrl, note: 'Upload demonstrativo (armazenado só neste navegador)' }], restricted: false, consent: { clinical: true, marketing: false } }
+    const f: FileAsset = { id: fid, tenantId: t.tenantId, createdAt: nowISO(), patientId, category: kind, name: u.name, mime: u.mime, sizeBytes: u.size, versions: [{ version: 1, at: nowISO(), by: actor.id, dataUrl: u.dataUrl, note: demoText('Upload demonstrativo (armazenado só neste navegador)', 'Upload de imagem') }], restricted: false, consent: { clinical: true, marketing: false } }
     db.insert(t.tenantId, 'files', f)
     db.insert(t.tenantId, 'dentalImages', { id: uid('dimg_'), tenantId: t.tenantId, createdAt: nowISO(), patientId, fileId: fid, tooth: n, takenOn: date, kind })
   }, 'Imagem adicionada à galeria do paciente.')
@@ -375,7 +375,7 @@ export function ImagesTab({ patientId }: { patientId: string }) {
   return (
     <div className="stack">
       <div className="grid grid-2">
-        <Section title="Enviar imagem (demonstrativo)">
+        <Section title={demoText('Enviar imagem (demonstrativo)', 'Enviar imagem')}>
           {!canUpload ? <ReadOnlyNotice>Seu perfil não envia arquivos clínicos.</ReadOnlyNotice> : (
             <div className="stack" style={S(12)}>
               <div className="form-grid">
@@ -383,7 +383,7 @@ export function ImagesTab({ patientId }: { patientId: string }) {
                 <Field label="Dente (opcional)"><Input inputMode="numeric" value={tooth} onChange={(e) => setTooth(e.target.value)} /></Field>
                 <Field label="Data"><Input type="date" value={date} max={todayCivil()} onChange={(e) => setDate(e.target.value)} /></Field>
               </div>
-              <FileUpload accept={['image/png', 'image/jpeg', 'image/webp']} maxMb={2} onFile={onFile} label="Selecionar imagem" hint="PNG, JPG ou WebP até 2 MB. Use apenas imagens fictícias." />
+              <FileUpload accept={['image/png', 'image/jpeg', 'image/webp']} maxMb={2} onFile={onFile} label="Selecionar imagem" hint={demoText('PNG, JPG ou WebP até 2 MB. Use apenas imagens fictícias.', 'PNG, JPG ou WebP até 2 MB.')} />
               <p className="tiny muted">O original não é recomprimido. DICOM/visualização diagnóstica é integração específica futura.</p>
             </div>
           )}
@@ -403,7 +403,7 @@ export function ImagesTab({ patientId }: { patientId: string }) {
         </Section>
       </div>
       <Section title="Galeria" actions={teeth.length > 0 ? <Select aria-label="Filtrar por dente" value={filterTooth} onChange={(e) => setFilterTooth(e.target.value)} style={{ minHeight: 40, width: 'auto' }}><option value="">Todos os dentes</option>{teeth.map((n) => <option key={n} value={n}>Dente {n}</option>)}</Select> : undefined}>
-        {list.length === 0 ? <p className="muted">Nenhuma imagem{filterTooth ? ' para este dente' : ''}. Envie uma imagem fictícia para demonstrar.</p> : (
+        {list.length === 0 ? <p className="muted">Nenhuma imagem{filterTooth ? ' para este dente' : ''}.{demoText(' Envie uma imagem fictícia para demonstrar.', ' Envie uma imagem.')}</p> : (
           <div className="stack">
             {Object.entries(byDate).map(([d, xs]) => (
               <div key={d} className="stack" style={S(8)}>

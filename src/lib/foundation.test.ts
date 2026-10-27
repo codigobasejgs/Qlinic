@@ -103,6 +103,7 @@ describe('permissões demonstrativas', () => {
     expect(can(reception, { resource: 'clinical', action: 'read', unitId: 'u1' })).toBe(false)
     expect(can(reception, { resource: 'clinical_restricted', action: 'read' })).toBe(false)
     expect(can(reception, { resource: 'agenda', action: 'create', unitId: 'u1' })).toBe(true)
+    expect(can(reception, { resource: 'agenda', action: 'approve', unitId: 'u1' })).toBe(false) // encaixe com conflito: só gestão
   })
   it('unidade fora do vínculo é negada', () => {
     expect(can(reception, { resource: 'agenda', action: 'read', unitId: 'u2' })).toBe(false)

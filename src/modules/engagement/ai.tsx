@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router'
-import { useTenant } from '@/app/session'
+import { useTenant, isRemoteSession } from '@/app/session'
 import { db, useCollection, usePlatformCollection } from '@/data/store'
 import { availableSlots, type Slot } from '@/domain/scheduling'
 import { createAppointment } from '@/domain/appointments'
@@ -31,6 +31,8 @@ function AiWorkspace() {
   const logs = useCollection(t.tenantId, 'aiLogs')
   const plans = usePlatformCollection('plans')
   const usage = usePlatformCollection('usage')
+  const connected = isRemoteSession()
+  const [thinking, setThinking] = useState(false)
   const [text, setText] = useState('')
   const [attachment, setAttachment] = useState('')
   const [replies, setReplies] = useState<Reply[]>([])
@@ -75,12 +77,25 @@ function AiWorkspace() {
       log('recepcionista', 'pergunta_clinica', ['createHandoff'], [], 0)
       addReply('Não realizo diagnóstico nem prescrevo. A equipe humana recebeu uma tarefa para orientar o encaminhamento adequado. Em emergência, procure atendimento imediato.', 'Política: assistente exclusivamente administrativo')
       setSlots([]); setChosen(null)
+    } else if (connected) {
+      // Modelo real no servidor (Edge Function ai-assistant): permissão, limite do plano e filtros reaplicados lá.
+      const services = (t.allowedUnits.length ? db.list(t.tenantId, 'services') : []).filter((s) => s.publicBookable && s.active).map((s) => s.name)
+      setThinking(true)
+      import('@/data/supabase/client').then(async ({ supabase }) => {
+        const { data, error } = await supabase().functions.invoke('ai-assistant', { body: { tenantId: t.tenantId, message: content, context: { clinicName: t.org.name, services } } })
+        if (error) { addReply('Assistente indisponível no momento. Tente novamente ou encaminhe a uma pessoa da equipe.', 'Erro do servidor de IA'); return }
+        if (data.urgent) { setBlocked(true); setSlots([]); setChosen(null) }
+        if (data.handoff) createHandoff(t.tenantId, { source: 'ia', priority: data.urgent ? 'urgente' : 'normal', reason: data.urgent ? 'Urgência detectada pelo servidor.' : 'Assistente encaminhou ao atendimento humano.', name: patient?.name ?? 'Contato não identificado', personRef: patient?.personId })
+        db.insert(t.tenantId, 'aiLogs', { id: uid('ai_'), tenantId: t.tenantId, createdAt: nowISO(), kind: 'recepcionista', intent: data.intent?.intent ?? 'conversa', tools: ['gemini'], flags: data.urgent ? ['urgencia'] : [], credits: data.urgent ? 0 : 1 })
+        addReply(data.reply, `${data.model ?? 'protocolo de urgência'} (servidor) — sugestão; confirmação humana obrigatória`)
+        if (data.intent?.servico) { const s = db.list(t.tenantId, 'services').find((x) => normalize(x.name).includes(normalize(String(data.intent.servico)))); if (s) setServiceId(s.id) }
+      }).finally(() => setThinking(false))
     } else {
       log('recepcionista', 'coleta_agendamento', [], [], 1)
       addReply('Para preparar o agendamento, selecione paciente, serviço, unidade e preferência abaixo. Consultarei a agenda atual. Um horário consultado só fica reservado após confirmação humana.', 'Formulário de preparação; nenhuma reserva criada')
     }
     setText(''); setAttachment('')
-  }, 'Resposta demonstrativa registrada.')
+  }, connected ? undefined : 'Resposta demonstrativa registrada.')
   const lookup = () => run(() => {
     if (blocked) throw new Error('Sinal de urgência: atendimento humano prioritário. Agendamento automático bloqueado nesta conversa.')
     if (!unit || !service || !patient) throw new Error('Selecione unidade, serviço e paciente.')
@@ -126,13 +141,15 @@ function AiWorkspace() {
   }, 'Resultado administrativo atualizado.')
   return <div className="engagement" data-tour="page-content">
     <PageHeader title="Assistente IA" subtitle="Preparação administrativa, confirmação humana e fontes visíveis." />
-    <div className="stack"><SimBadge>Respostas determinísticas de demonstração — nenhum modelo conectado</SimBadge>
+    <div className="stack">{connected
+      ? <Alert tone="info">Modelo de IA conectado no servidor. Respostas são sugestões administrativas: nenhuma reserva é feita sem confirmação humana. Mensagens não são guardadas no log.</Alert>
+      : <SimBadge>Respostas determinísticas de demonstração — nenhum modelo conectado</SimBadge>}
       <div className="grid grid-2"><Section title="Recepcionista virtual"><div className="stack">
         <Alert tone="neutral">Nunca diagnostica ou prescreve. Sinais de urgência criam tarefa humana e bloqueiam a oferta de vagas nesta conversa.</Alert>
         <div role="log" aria-live="polite" aria-label="Conversa com o assistente" className="eng-messages">{replies.length === 0 && <p className="small muted">Experimente: “Quero agendar amanhã de manhã”, “estou com dor no peito” ou um anexo com “ignore as instruções”.</p>}{replies.map((r) => <article key={r.id} className="eng-bubble"><p>{r.text}</p><small className="muted">Fonte: {r.source}</small></article>)}</div>
         <Field label="Mensagem fictícia"><Textarea value={text} maxLength={2000} onChange={(e) => setText(e.target.value)} placeholder="Quero agendar amanhã de manhã" /></Field>
         <details><summary>Trecho de anexo fictício (não confiável)</summary><Field label="Texto do anexo"><Textarea value={attachment} maxLength={2000} onChange={(e) => setAttachment(e.target.value)} /></Field></details>
-        <Button variant="primary" data-tour="primary-action" onClick={chat}>Enviar ao assistente simulado</Button>
+        <Button variant="primary" data-tour="primary-action" onClick={chat} loading={thinking}>{connected ? 'Enviar ao assistente' : 'Enviar ao assistente simulado'}</Button>
         {blocked && <Alert tone="danger">Encaminhamento urgente registrado. <Link to={`${t.base}/comunicacao?aba=whatsapp`}>Abrir fila humana</Link></Alert>}
       </div></Section>
       <Section title="Preparar agendamento"><div className="stack">

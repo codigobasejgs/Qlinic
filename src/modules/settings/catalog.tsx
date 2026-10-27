@@ -6,7 +6,7 @@ import { db, useCollection } from '@/data/store'
 import { audit } from '@/data/repositories'
 import type { ID, Professional, Resource, ResourceKind, Service, StaffUser, TenantRole, Unit } from '@/domain/types'
 import { TENANT_ROLE_LABEL } from '@/domain/permissions'
-import { Badge, Button, Checkbox, DataTable, Dialog, Field, Input, Select, useAction, useConfirm, type Column } from '@/ui'
+import { Badge, Button, Checkbox, DataTable, demoText, Dialog, Field, Input, Select, useAction, useConfirm, type Column } from '@/ui'
 import { formatBRL, parseBRL } from '@/lib/money'
 import { hhmmToMinutes, minutesToHHMM, nowISO } from '@/lib/dates'
 import { maskPhone, uid } from '@/lib/util'
@@ -475,7 +475,7 @@ function ProfessionalDialog({ target, onClose }: { target: Professional | 'new';
       <div className="stack">
         <div className="form-grid">
           <Field label="Nome do profissional" required><Input value={name} onChange={(e) => setName(e.target.value)} /></Field>
-          <Field label="Conselho / Registro (fictício)" required><Input value={council} onChange={(e) => setCouncil(e.target.value)} placeholder="CRO-SP 00000 (fictício)" /></Field>
+          <Field label={demoText('Conselho / Registro (fictício)', 'Conselho / Registro')} required><Input value={council} onChange={(e) => setCouncil(e.target.value)} placeholder={demoText('CRO-SP 00000 (fictício)', 'CRO-SP 00000')} /></Field>
           <Field label="Especialidade" required><Input value={spec} onChange={(e) => setSpec(e.target.value)} /></Field>
           <Field label="Cor na agenda"><Input type="color" value={color} onChange={(e) => setColor(e.target.value)} style={{ width: 60, padding: 2 }} /></Field>
         </div>

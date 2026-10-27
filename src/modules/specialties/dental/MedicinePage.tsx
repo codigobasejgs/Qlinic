@@ -7,7 +7,7 @@ import { useActor, useTenant } from '@/app/session'
 import { db, useCollection } from '@/data/store'
 import { clinicalRepo, documentRepo } from '@/data/repositories'
 import { createAppointment } from '@/domain/appointments'
-import { Alert, Badge, Button, DataTable, DemoPaper, Dialog, Field, FileUpload, Input, PageHeader, Section, Select, Tabs, TabPanel, Textarea, Timeline, useAction, useLookup, usePatientParam, type Column, type Tone } from '@/ui'
+import { Alert, Badge, Button, DataTable, DemoPaper, demoText, Dialog, Field, FileUpload, Input, PageHeader, Section, Select, Tabs, TabPanel, Textarea, Timeline, useAction, useLookup, usePatientParam, type Column, type Tone } from '@/ui'
 import { ageFromBirth, formatCivil, formatDateTime, hhmmToMinutes, nowISO, todayCivil, zonedToInstant, addMinutes } from '@/lib/dates'
 import { uid } from '@/lib/util'
 import { DEFAULT_SOAP, VITAL_LIMITS, bmi, bmiBand, transitionExam, validateGrowth, validateVitals, type ExamOrder, type FollowUp, type GrowthMeasure, type Referral, type ReferralPriority, type SoapSection, type SoapTemplate, type VitalInput, type VitalSigns } from './medicine'
@@ -213,7 +213,7 @@ function ExamsTab({ patientId }: { patientId: string }) {
   const move = (e: ExamOrder, to: ExamOrder['status'], patch?: Partial<ExamOrder>) => run(() => db.update(t.tenantId, 'examOrders', e.id, (p) => transitionExam(p, to, actor.name, patch)), `Exame: ${EX_LABEL[to]}.`)
   const attach = (u: { name: string; mime: string; size: number; dataUrl: string }) => {
     const id = uid('file_')
-    db.insert(t.tenantId, 'files', { id, tenantId: t.tenantId, createdAt: nowISO(), patientId, category: 'exame', name: u.name, mime: u.mime, sizeBytes: u.size, versions: [{ version: 1, at: nowISO(), by: actor.id, dataUrl: u.dataUrl, note: 'Anexo demonstrativo' }], restricted: false })
+    db.insert(t.tenantId, 'files', { id, tenantId: t.tenantId, createdAt: nowISO(), patientId, category: 'exame', name: u.name, mime: u.mime, sizeBytes: u.size, versions: [{ version: 1, at: nowISO(), by: actor.id, dataUrl: u.dataUrl, note: demoText('Anexo demonstrativo', 'Anexo de resultado') }], restricted: false })
     setFileId(id)
   }
   return (
@@ -253,7 +253,7 @@ function ExamsTab({ patientId }: { patientId: string }) {
       <Dialog open={!!recv} onClose={() => setRecv(null)} title={`Recebimento — ${recv?.name ?? ''}`} footer={<><Button onClick={() => setRecv(null)}>Cancelar</Button><Button variant="primary" onClick={() => { if (recv) { move(recv, 'recebido', { receivedOn: todayCivil(), resultNote: note.trim() || undefined, fileId }); setRecv(null) } }}>Registrar</Button></>}>
         <div className="stack" style={S(12)}>
           <Field label="Observação"><Textarea rows={2} value={note} onChange={(e) => setNote(e.target.value)} /></Field>
-          <FileUpload accept={['application/pdf', 'image/png', 'image/jpeg']} maxMb={2} onFile={attach} label="Anexar resultado (demonstrativo)" hint="PDF/PNG/JPG fictício até 2 MB." />
+          <FileUpload accept={['application/pdf', 'image/png', 'image/jpeg']} maxMb={2} onFile={attach} label={demoText('Anexar resultado (demonstrativo)', 'Anexar resultado')} hint={demoText('PDF/PNG/JPG fictício até 2 MB.', 'PDF/PNG/JPG até 2 MB.')} />
           {fileId && <p className="small" aria-live="polite">Anexo pronto.</p>}
         </div>
       </Dialog>
