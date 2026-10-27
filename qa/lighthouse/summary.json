@@ -1,0 +1,117 @@
+{
+  "at": "2026-10-27T16:51:49.683Z",
+  "lighthouse": "12.8.2",
+  "profile": "mobile padrão (throttling simulado)",
+  "host": "Windows 10, vite preview local",
+  "results": [
+    {
+      "id": "landing",
+      "path": "/",
+      "performance": 70,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "fcp": "3.8 s",
+      "lcp": "5.8 s",
+      "tbt": "0 ms",
+      "cls": "0",
+      "a11yFails": [],
+      "perfOpp": [
+        "prioritize-lcp-image Est savings of 1,050 ms",
+        "render-blocking-resources Est savings of 300 ms",
+        "unused-javascript Est savings of 244 KiB",
+        "uses-responsive-images Est savings of 171 KiB"
+      ]
+    },
+    {
+      "id": "planos",
+      "path": "/planos",
+      "performance": 100,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "fcp": "0.7 s",
+      "lcp": "0.7 s",
+      "tbt": "50 ms",
+      "cls": "0",
+      "a11yFails": [],
+      "perfOpp": []
+    },
+    {
+      "id": "demonstracao",
+      "path": "/demonstracao",
+      "performance": 100,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "fcp": "0.7 s",
+      "lcp": "0.8 s",
+      "tbt": "0 ms",
+      "cls": "0",
+      "a11yFails": [],
+      "perfOpp": []
+    },
+    {
+      "id": "ajuda",
+      "path": "/ajuda",
+      "performance": 100,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "fcp": "0.7 s",
+      "lcp": "0.7 s",
+      "tbt": "0 ms",
+      "cls": "0",
+      "a11yFails": [],
+      "perfOpp": []
+    },
+    {
+      "id": "clinica-publica",
+      "path": "/c/vet-amigo",
+      "performance": 100,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "fcp": "0.7 s",
+      "lcp": "0.7 s",
+      "tbt": "0 ms",
+      "cls": "0",
+      "a11yFails": [],
+      "perfOpp": []
+    },
+    {
+      "id": "agendamento-publico",
+      "path": "/c/vet-amigo/agendar",
+      "performance": 87,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "fcp": "0.7 s",
+      "lcp": "0.7 s",
+      "tbt": "540 ms",
+      "cls": "0",
+      "a11yFails": [],
+      "perfOpp": []
+    },
+    {
+      "id": "portal-inicio",
+      "path": "/c/vet-amigo/portal",
+      "performance": 100,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "fcp": "0.7 s",
+      "lcp": "0.7 s",
+      "tbt": "0 ms",
+      "cls": "0",
+      "a11yFails": [],
+      "perfOpp": []
+    },
+    {
+      "id": "portal-vacinas",
+      "path": "/c/vet-amigo/portal/vacinas",
+      "performance": 100,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "fcp": "0.7 s",
+      "lcp": "0.7 s",
+      "tbt": "20 ms",
+      "cls": "0",
+      "a11yFails": [],
+      "perfOpp": []
+    }
+  ]
+}

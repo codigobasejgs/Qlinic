@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sem conexão — Qlinic</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; background: #F7FAFC; color: #102A43; padding: 16px; }
+  @media (prefers-color-scheme: dark) { body { background: #091923; color: #F1F5F9; } p { color: #A7BAC8 !important; } }
+  main { max-width: 420px; text-align: center; display: flex; flex-direction: column; gap: 12px; align-items: center; }
+  p { color: #526579; margin: 0; }
+  button { min-height: 44px; padding: 0 18px; border: 0; border-radius: 10px; background: #087F75; color: #fff; font-weight: 600; font-size: 15px; cursor: pointer; }
+  :focus-visible { outline: 3px solid #087F75; outline-offset: 3px; }
+</style>
+</head>
+<body>
+<main>
+  <img src="/brand/svg/qlinic-simbolo-principal.svg" width="56" height="56" alt="" />
+  <h1 style="margin:0;font-size:22px">Você está sem conexão</h1>
+  <p>Nenhum horário, pagamento ou assinatura é confirmado sem conexão. Verifique sua internet e tente novamente.</p>
+  <button type="button" onclick="location.reload()">Tentar novamente</button>
+</main>
+</body>
+</html>

@@ -1,0 +1,15 @@
+node_modules
+dist
+.env
+.env.local
+.env.*.local
+test-results
+playwright-report
+qa/tmp
+qa/lighthouse/*.json
+!qa/lighthouse/summary.json
+qa/e2e-results.json
+*.log
+.vercel
+# Pacote original (já extraído nesta pasta)
+Qlinic_Pacote_Inicial_Com_Prompt.zip

@@ -1,0 +1,16 @@
+QLINIC — PACOTE INICIAL
+
+1. Extraia este ZIP em uma pasta local destinada ao Qlinic.
+2. Abra a pasta que contém PROMPT_MASTER_QLINIC_CLAUDE_CODE.md no Claude Code.
+3. Envie a instrução abaixo:
+
+Leia integralmente PROMPT_MASTER_QLINIC_CLAUDE_CODE.md e execute o projeto.
+Ainda não existe uma aplicação; os arquivos desta pasta são o pacote inicial.
+Preserve public/brand, design-system e docs. Aplique a identidade fornecida,
+sem recriar o logo. Desenvolva primeiro todo o frontend e valide os fluxos,
+responsividade, PWA e acessibilidade. Backend e integrações reais serão posteriores.
+Comece pela inspeção da pasta e prossiga para implementação conforme o documento.
+
+Não precisa anexar os PNGs um por um: eles já estão em public/brand/png.
+Use o prompt desta versão 1.1 no lugar da versão anterior.
+Este ZIP não é ainda o código do sistema; é o material para iniciar a construção.

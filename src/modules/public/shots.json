@@ -1,0 +1,146 @@
+{
+  "agenda": {
+    "file": "agenda.png",
+    "w": 1440,
+    "h": 900,
+    "stub": false,
+    "route": "/app/sorriso-pleno/agenda",
+    "at": "2026-10-27T16:28:36.061Z"
+  },
+  "odontograma": {
+    "file": "odontograma.png",
+    "w": 1440,
+    "h": 900,
+    "stub": false,
+    "route": "/app/sorriso-pleno/odontologia?paciente=org_sorriso_pat1",
+    "at": "2026-10-27T16:28:37.576Z"
+  },
+  "portal-mobile": {
+    "file": "portal-mobile.png",
+    "w": 390,
+    "h": 844,
+    "stub": false,
+    "route": "/c/vet-amigo/portal",
+    "at": "2026-10-27T16:28:39.108Z"
+  },
+  "master": {
+    "file": "master.png",
+    "w": 1440,
+    "h": 900,
+    "stub": false,
+    "route": "/master",
+    "at": "2026-10-27T16:28:40.641Z"
+  },
+  "recepcao": {
+    "file": "recepcao.png",
+    "w": 1440,
+    "h": 900,
+    "stub": false,
+    "route": "/app/clinica-vitta/recepcao",
+    "at": "2026-10-27T16:28:42.192Z"
+  },
+  "totem": {
+    "file": "totem.png",
+    "w": 1440,
+    "h": 900,
+    "stub": false,
+    "route": "/c/clinica-vitta/totem",
+    "at": "2026-10-27T16:28:43.750Z"
+  },
+  "onboarding": {
+    "file": "onboarding.png",
+    "w": 1440,
+    "h": 900,
+    "stub": false,
+    "route": "/app/sorriso-pleno/onboarding",
+    "at": "2026-10-27T16:28:45.354Z"
+  },
+  "consulta": {
+    "file": "consulta.png",
+    "w": 1440,
+    "h": 900,
+    "stub": false,
+    "route": "/app/clinica-vitta/pacientes",
+    "at": "2026-10-27T16:28:46.929Z"
+  },
+  "financeiro": {
+    "file": "financeiro.png",
+    "w": 1440,
+    "h": 900,
+    "stub": false,
+    "route": "/app/sorriso-pleno/financeiro",
+    "at": "2026-10-27T16:28:48.498Z"
+  },
+  "comissoes": {
+    "file": "comissoes.png",
+    "w": 1440,
+    "h": 900,
+    "stub": false,
+    "route": "/app/sorriso-pleno/comissoes",
+    "at": "2026-10-27T16:28:50.074Z"
+  },
+  "estoque": {
+    "file": "estoque.png",
+    "w": 1440,
+    "h": 900,
+    "stub": false,
+    "route": "/app/vet-amigo/estoque",
+    "at": "2026-10-27T16:28:51.641Z"
+  },
+  "crm": {
+    "file": "crm.png",
+    "w": 1440,
+    "h": 900,
+    "stub": false,
+    "route": "/app/lumiere-estetica/crm",
+    "at": "2026-10-27T16:28:53.227Z"
+  },
+  "veterinaria": {
+    "file": "veterinaria.png",
+    "w": 1440,
+    "h": 900,
+    "stub": false,
+    "route": "/app/vet-amigo/veterinaria",
+    "at": "2026-10-27T16:28:54.821Z"
+  },
+  "psicologia": {
+    "file": "psicologia.png",
+    "w": 1440,
+    "h": 900,
+    "stub": false,
+    "route": "/app/espaco-escuta/psicologia",
+    "at": "2026-10-27T16:28:56.387Z"
+  },
+  "marca": {
+    "file": "marca.png",
+    "w": 1440,
+    "h": 900,
+    "stub": false,
+    "route": "/app/sorriso-pleno/marca",
+    "at": "2026-10-27T16:28:57.961Z"
+  },
+  "configuracoes": {
+    "file": "configuracoes.png",
+    "w": 1440,
+    "h": 900,
+    "stub": false,
+    "route": "/app/sorriso-pleno/configuracoes",
+    "at": "2026-10-27T16:28:59.544Z"
+  },
+  "importacao": {
+    "file": "importacao.png",
+    "w": 1440,
+    "h": 900,
+    "stub": false,
+    "route": "/app/sorriso-pleno/importacao",
+    "at": "2026-10-27T16:29:01.109Z"
+  },
+  "permissoes": {
+    "file": "permissoes.png",
+    "w": 1440,
+    "h": 900,
+    "stub": false,
+    "route": "/app/sorriso-pleno/permissoes",
+    "at": "2026-10-27T16:29:02.711Z"
+  }
+}

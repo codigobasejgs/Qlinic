@@ -1,0 +1,74 @@
+/* Módulo clínico — somente tokens var(--q-*). */
+.filters { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)); align-items: end; }
+.filters > .field:first-child { grid-column: span 2; }
+@media (max-width: 767px) { .filters > .field:first-child { grid-column: auto; } }
+.pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.h-sm { font-size: 15px; }
+
+.rec-view { margin: 0; display: grid; gap: 10px; }
+.rec-view > div { display: grid; grid-template-columns: minmax(140px, 220px) 1fr; gap: 12px; }
+.rec-view dt { color: var(--q-text-muted); font-size: 13px; font-weight: 600; }
+.rec-view dd { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+@media (max-width: 600px) { .rec-view > div { grid-template-columns: 1fr; gap: 2px; } }
+.form-section { font-size: 15px; padding-top: 6px; border-top: 1px solid var(--q-border); }
+.addendum { border-left: 3px solid var(--q-info); padding: 6px 10px; background: var(--q-surface-muted); border-radius: 0 8px 8px 0; }
+
+.detail-grid { display: grid; gap: 16px; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); align-items: start; }
+@media (max-width: 1023px) { .detail-grid { grid-template-columns: minmax(0, 1fr); } }
+.shortcut { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; padding: 0 12px; border-radius: 10px; color: var(--q-text); text-decoration: none; font-weight: 600; font-size: 14px; border: 1px solid var(--q-border); }
+.shortcut:hover { background: var(--q-surface-muted); }
+
+.weights { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.weights li { display: grid; grid-template-columns: 90px 1fr 70px; gap: 10px; align-items: center; }
+.wbar { height: 8px; background: var(--q-surface-muted); border-radius: 999px; overflow: hidden; }
+.wbar > span { display: block; height: 100%; background: var(--q-primary); }
+.weights strong { text-align: right; }
+
+.chip-x { border: 0; background: none; color: inherit; cursor: pointer; font-size: 16px; line-height: 1; min-width: 24px; min-height: 24px; padding: 0; }
+.resp-card { border: 1px solid var(--q-border); border-radius: var(--q-r-input); padding: 12px; display: flex; flex-direction: column; gap: 10px; background: var(--q-surface-muted); }
+
+.gallery { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+.gallery-item { width: 100%; display: flex; flex-direction: column; gap: 4px; padding: 8px; border: 1px solid var(--q-border); border-radius: 12px; background: var(--q-surface); cursor: pointer; text-align: left; min-width: 0; color: var(--q-text); }
+.gallery-item:hover { border-color: var(--q-primary); }
+.gallery-item img, .gallery-pdf { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 8px; background: var(--q-surface-muted); }
+.gallery-pdf { display: flex; align-items: center; justify-content: center; font-weight: 800; color: var(--q-text-muted); }
+.file-preview { max-height: 60vh; width: auto; margin: 0 auto; border-radius: 8px; }
+
+.merge-table tr.diff th { color: var(--q-warning); }
+.merge-table .check { min-height: 36px; padding: 4px 0; }
+
+/* Modo consulta */
+.consult { display: grid; gap: 16px; grid-template-columns: minmax(280px, 380px) minmax(0, 1fr); align-items: start; }
+.consult-side { position: sticky; top: calc(var(--q-header-h) + 12px); max-height: calc(100dvh - var(--q-header-h) - 24px); overflow-y: auto; padding-right: 4px; --gap: 12px; }
+.consult-main { --gap: 16px; min-width: 0; }
+@media (max-width: 1023px) { .consult { grid-template-columns: minmax(0, 1fr); } .consult-side { position: static; max-height: none; } }
+.hist-item { border: 1px solid var(--q-border); border-radius: 12px; background: var(--q-surface); padding: 0 12px; }
+.hist-item > summary { gap: 8px; font-size: 13px; }
+.hist-item[open] { padding-bottom: 12px; }
+.hist-item .card { border: 0; padding: 0; }
+.consult-actions { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; position: sticky; bottom: 0; padding: 12px; background: var(--q-surface); border: 1px solid var(--q-border); border-radius: var(--q-r-card); z-index: 5; }
+@media (max-width: 767px) { .consult-actions { position: static; } .consult-actions .btn { flex: 1 1 auto; } }
+
+.rec-live { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 12px 14px; border-radius: var(--q-r-input); background: var(--q-danger-bg); color: var(--q-danger); border: 2px solid currentColor; }
+.rec-live.pausado { background: var(--q-warning-bg); color: var(--q-warning); }
+.rec-dot { width: 12px; height: 12px; border-radius: 50%; background: currentColor; }
+.rec-live.gravando .rec-dot { animation: recpulse 1.2s infinite; }
+@keyframes recpulse { 50% { opacity: 0.25; } }
+@media (prefers-reduced-motion: reduce) { .rec-live.gravando .rec-dot { animation: none; } }
+.seg { border: 1px dashed var(--q-input-border); border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; }
+.seg-aceito { border-style: solid; border-color: var(--q-success); }
+.seg-descartado { opacity: 0.6; }
+
+/* Documentos */
+.doc-editor-grid { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
+@media (max-width: 1023px) { .doc-editor-grid { grid-template-columns: minmax(0, 1fr); } }
+.signers { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.signers li { padding: 8px 12px; border: 1px solid var(--q-border); border-radius: 10px; }
+
+/* Formulários */
+.forms-layout { display: grid; gap: 16px; grid-template-columns: 260px minmax(0, 1fr); align-items: start; }
+@media (max-width: 1023px) { .forms-layout { grid-template-columns: minmax(0, 1fr); } }
+.form-pick { width: 100%; display: flex; flex-direction: column; gap: 2px; text-align: left; padding: 10px 12px; min-height: 44px; border: 1px solid var(--q-border); border-radius: 10px; background: var(--q-surface); cursor: pointer; color: var(--q-text); }
+.form-pick[aria-current='true'] { border-color: var(--q-primary); background: var(--q-primary-soft); }
+.builder { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.builder-item { border: 1px solid var(--q-border); border-radius: 12px; padding: 12px; background: var(--q-surface); display: flex; flex-direction: column; gap: 10px; }

@@ -1,0 +1,31 @@
+/* Super Admin — complementos sobre app.css (somente tokens var(--q-*)). */
+.pl-metric { gap: 6px; }
+.pl-def-btn { all: unset; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--q-primary-text); text-decoration: underline; min-height: 24px; align-self: flex-start; }
+.pl-def-btn:focus-visible { outline: 3px solid var(--q-focus); outline-offset: 2px; border-radius: 4px; }
+.pl-def { background: var(--q-surface-muted); border-radius: 8px; padding: 8px 10px; display: flex; flex-direction: column; gap: 4px; color: var(--q-text); }
+.pl-chart { position: relative; width: 100%; max-width: 760px; }
+.pl-chart svg { width: 100%; height: auto; overflow: visible; }
+.pl-chart .bar { fill: var(--q-primary); }
+.pl-chart .bar-hit { fill: transparent; cursor: pointer; }
+.pl-chart .bar-hit:focus-visible { outline: none; stroke: var(--q-focus); stroke-width: 3; }
+.pl-chart .bar.dim { opacity: 0.55; }
+.pl-chart .grid-line { stroke: var(--q-border); stroke-width: 1; }
+.pl-chart .axis-text { fill: var(--q-text-muted); font-size: 12px; }
+.pl-chart .val-text { fill: var(--q-text); font-size: 12px; font-weight: 600; }
+.pl-tip { position: absolute; transform: translate(-50%, -100%); background: var(--q-text); color: var(--q-surface); padding: 6px 10px; border-radius: 8px; font-size: 12px; pointer-events: none; white-space: nowrap; box-shadow: var(--q-shadow); }
+.pl-usage { display: grid; grid-template-columns: minmax(90px, 140px) 1fr auto; gap: 8px 12px; align-items: center; font-size: 14px; }
+.pl-usage .progress { min-width: 60px; }
+.pl-msg { border-radius: 12px; padding: 8px 12px; max-width: 85%; font-size: 14px; }
+.pl-msg.cliente { background: var(--q-surface-muted); align-self: flex-start; }
+.pl-msg.suporte { background: var(--q-primary-soft); align-self: flex-end; }
+.pl-clinic-panel { border: 2px dashed var(--q-warning); border-radius: var(--q-r-card); padding: 16px; background: var(--q-warning-bg); color: var(--q-text); }
+.pl-assisted-on { border-left: 4px solid var(--q-warning); }
+.pl-manifest-icons { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+.pl-manifest-icons figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px; color: var(--q-text-muted); }
+.pl-manifest-icons img { width: 64px; height: 64px; border-radius: 12px; border: 1px solid var(--q-border); background: var(--q-surface-muted); }
+.pl-matrix th, .pl-matrix td { text-align: center; }
+.pl-matrix th:first-child, .pl-matrix td:first-child { text-align: left; }
+.pl-mods { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 190px), 1fr)); gap: 0 12px; }
+.pl-pre { white-space: pre-wrap; word-break: break-word; }
+.pl-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+@media (max-width: 767px) { .pl-usage { grid-template-columns: 1fr auto; } .pl-usage .progress { grid-column: 1 / -1; } }

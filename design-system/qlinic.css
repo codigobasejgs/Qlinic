@@ -1,0 +1,51 @@
+/* Qlinic 1.0 — cores semânticas e temas. Inter não está embutida. */
+:root, [data-theme="light"] {
+  --q-background: #F7FAFC;
+  --q-surface: #FFFFFF;
+  --q-surface-muted: #EEF5F5;
+  --q-text: #102A43;
+  --q-text-muted: #526579;
+  --q-border: #DCE5EC;
+  --q-input-border: #718096;
+  --q-primary: #087F75;
+  --q-on-primary: #FFFFFF;
+  --q-primary-hover: #06675F;
+  --q-focus: #087F75;
+  --q-success: #166534;
+  --q-success-bg: #DCFCE7;
+  --q-warning: #92400E;
+  --q-warning-bg: #FEF3C7;
+  --q-danger: #B91C1C;
+  --q-danger-bg: #FEE2E2;
+  --q-info: #1D4ED8;
+  --q-info-bg: #DBEAFE;
+}
+[data-theme="dark"] {
+  --q-background: #091923;
+  --q-surface: #102632;
+  --q-surface-muted: #173440;
+  --q-text: #F1F5F9;
+  --q-text-muted: #A7BAC8;
+  --q-border: #294553;
+  --q-input-border: #708996;
+  --q-primary: #5EEAD4;
+  --q-on-primary: #102A43;
+  --q-primary-hover: #99F6E4;
+  --q-focus: #5EEAD4;
+  --q-success: #86EFAC;
+  --q-success-bg: #143A2B;
+  --q-warning: #FCD34D;
+  --q-warning-bg: #3B301C;
+  --q-danger: #FCA5A5;
+  --q-danger-bg: #43252C;
+  --q-info: #93C5FD;
+  --q-info-bg: #19334D;
+}
+
+:root { --q-font: Inter, system-ui, -apple-system, "Segoe UI", sans-serif; --q-radius: 10px; }
+.q-button { background:var(--q-primary); color:var(--q-on-primary); border:0; border-radius:var(--q-radius); min-height:44px; padding:10px 18px; font:600 14px var(--q-font); cursor:pointer; }
+.q-button:hover { background:var(--q-primary-hover); }
+:focus-visible { outline:3px solid var(--q-focus); outline-offset:3px; }
+.q-input { background:var(--q-surface);color:var(--q-text);border:1px solid var(--q-input-border);border-radius:var(--q-radius);min-height:44px;padding:0 12px;font:400 16px var(--q-font); }
+.q-card { background:var(--q-surface);color:var(--q-text);border:1px solid var(--q-border);border-radius:16px;padding:24px; }
+@media (prefers-reduced-motion: reduce) { *,*::before,*::after { animation:none!important; transition:none!important; scroll-behavior:auto!important; } }

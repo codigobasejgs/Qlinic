@@ -1,0 +1,38 @@
+/* Módulo comercial — somente tokens var(--q-*). */
+.com-toolbar { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)); align-items: end; margin-bottom: 12px; }
+.com-neg { color: var(--q-danger); }
+.com-pos { color: var(--q-success); }
+.com-kanban { grid-auto-columns: minmax(240px, 1fr); }
+.com-kanban .kanban-col h2 { font-size: 14px; display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+.com-kanban .kanban-card { cursor: grab; }
+.com-kanban .kanban-card:focus-within { outline: 2px solid var(--q-focus); outline-offset: 1px; }
+.com-kanban .kanban-card .card-title { all: unset; cursor: pointer; font-weight: 650; font-size: 14px; }
+.com-kanban .kanban-card .card-title:focus-visible { outline: 3px solid var(--q-focus); border-radius: 4px; }
+.com-kanban .kanban-card .select { min-height: 36px; font-size: 13px; }
+@media (pointer: coarse) { .com-kanban .kanban-card .select { min-height: 44px; } }
+.com-memo { font-size: 12px; color: var(--q-text-muted); line-height: 1.45; }
+.com-chart { width: 100%; height: auto; }
+.com-chart text { fill: var(--q-text-muted); font-size: 11px; }
+.com-chart .axis { stroke: var(--q-border); }
+.com-legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 13px; }
+.com-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.com-legend i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.com-sw-1 { background: var(--q-text-muted); fill: var(--q-text-muted); }
+.com-sw-2 { background: var(--q-primary); fill: var(--q-primary); }
+.com-sw-3 { background: var(--q-info); fill: var(--q-info); }
+.com-items { display: flex; flex-direction: column; gap: 12px; }
+.com-item { border: 1px solid var(--q-border); border-radius: 12px; padding: 12px; display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr)); align-items: end; background: var(--q-surface); }
+.com-item .wide { grid-column: 1 / -1; }
+.com-scen { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); }
+.com-dl { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; margin: 0; font-size: 14px; }
+.com-dl dt { color: var(--q-text-muted); }
+.com-dl dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
+.com-dl .total { font-weight: 700; border-top: 1px solid var(--q-border); padding-top: 4px; }
+@media (max-width: 767px) {
+  .com-page .grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .com-page .kpi { padding: 12px 14px; }
+  .com-page .kpi .kpi-value { font-size: 18px; overflow-wrap: anywhere; }
+}
+.com-paper-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.com-paper-table td, .com-paper-table th { border-bottom: 1px solid #D9E2EC; padding: 6px 4px; text-align: left; }
+.com-paper-table .num { text-align: right; }

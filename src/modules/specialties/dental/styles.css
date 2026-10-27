@@ -1,0 +1,76 @@
+/* Odontologia / Medicina / Convênios — sobre tokens var(--q-*). Cores fixas só em ilustração SVG. */
+
+/* ---------- Odontograma ---------- */
+.odo-layout { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 1200px) { .odo-layout { grid-template-columns: minmax(0, 1.7fr) minmax(340px, 1fr); align-items: start; } }
+.odo-wrap { width: 100%; }
+.odo-svg { width: 100%; height: auto; max-width: 900px; margin: 0 auto; user-select: none; }
+.zoom-pan .odo-svg { min-width: 760px; max-width: none; }
+.odo-face { fill: var(--q-surface); stroke: var(--q-text-muted); stroke-width: 1; cursor: pointer; }
+.odo-face-bg { fill: var(--q-surface); }
+.odo-face-over { stroke: var(--q-text-muted); stroke-width: 1; pointer-events: none; }
+.odo-face-g:hover .odo-face { stroke: var(--q-primary); stroke-width: 2; }
+.odo-face-sel { fill: none; stroke: var(--q-focus); stroke-width: 3; pointer-events: none; }
+.odo-ring { fill: none; stroke: transparent; stroke-width: 2; }
+.odo-tooth { cursor: pointer; outline: none; }
+.odo-tooth:focus-visible .odo-ring { stroke: var(--q-focus); stroke-width: 3; }
+.odo-tooth.sel .odo-ring { stroke: var(--q-primary); stroke-width: 2.5; stroke-dasharray: none; }
+.odo-tooth.absent .odo-face { fill: var(--q-surface-muted); }
+.odo-num { font-size: 12px; font-weight: 700; fill: var(--q-text); }
+.odo-tooth.sel .odo-num { fill: var(--q-primary-text); }
+.odo-side { font-size: 10px; fill: var(--q-text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.odo-midline { stroke: var(--q-border); stroke-width: 1; stroke-dasharray: 4 3; }
+.odo-x line { stroke: var(--q-text); stroke-width: 2.5; stroke-linecap: round; }
+.odo-ext { stroke: #B91C1C; stroke-width: 3; stroke-dasharray: 4 3; stroke-linecap: round; }
+.odo-code { font-size: 7.5px; font-weight: 700; }
+.odo-code-more { font-size: 9px; fill: var(--q-text-muted); }
+.odo-chip { display: inline-flex; align-items: center; justify-content: center; min-width: 26px; height: 18px; padding: 0 4px; border-radius: 4px; color: #fff; font-size: 10px; font-weight: 700; flex: none; }
+.odo-hist .odo-chip { min-width: 10px; width: 10px; height: 10px; border-radius: 50%; margin-top: 6px; padding: 0; }
+.odo-faces { display: flex; flex-wrap: wrap; gap: 6px; }
+.odo-face-btn { min-height: 44px; padding: 0 12px; }
+.odo-face-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.odo-goto { min-width: 200px; flex: 0 1 260px; }
+.odo-hist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.odo-hist li { display: flex; gap: 10px; align-items: flex-start; padding: 10px 0; border-top: 1px solid var(--q-border); flex-wrap: wrap; }
+.odo-hist li.voided { opacity: 0.6; }
+.odo-hist li.voided strong { text-decoration: line-through; }
+
+/* ---------- Periodontograma ---------- */
+.perio-chart { display: flex; flex-direction: column; gap: 6px; min-width: 640px; }
+.perio-row { display: grid; grid-template-columns: repeat(16, minmax(36px, 1fr)); gap: 3px; }
+.perio-row > :nth-child(8) { margin-right: 6px; }
+.perio-cell { position: relative; min-height: 48px; border: 1px solid var(--q-border); border-radius: 8px; background: var(--q-surface); cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; padding: 2px; color: var(--q-text); }
+.perio-cell[aria-pressed='true'] { outline: 3px solid var(--q-focus); outline-offset: 1px; }
+.perio-cell.pd-ok, .perio-sw.pd-ok { background: var(--q-success-bg); }
+.perio-cell.pd-mid, .perio-sw.pd-mid { background: var(--q-warning-bg); }
+.perio-cell.pd-hi, .perio-sw.pd-hi { background: var(--q-danger-bg); border-color: var(--q-danger); }
+.perio-cell.pd-hi strong { text-decoration: underline; }
+.perio-cell.missing { background: var(--q-surface-muted); color: var(--q-text-muted); }
+.perio-bleed { position: absolute; top: 2px; right: 4px; font-size: 9px; color: var(--q-danger); }
+.perio-sw { display: inline-block; width: 14px; height: 14px; border-radius: 4px; border: 1px solid var(--q-border); }
+.perio-in { min-height: 40px; width: 64px; text-align: center; padding: 0 6px; }
+.perio-table td, .perio-table th { padding: 6px 10px; }
+
+/* ---------- Ortodontia ---------- */
+.aligner-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(48px, 1fr)); gap: 4px; }
+.aligner-step { min-height: 48px; border: 1px solid var(--q-border); border-radius: 8px; background: var(--q-surface); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; color: var(--q-text); }
+.aligner-step:disabled { cursor: default; }
+.aligner-step.done { background: var(--q-primary-soft); border-color: var(--q-primary); color: var(--q-on-soft); }
+.aligner-step.current { outline: 3px solid var(--q-primary); outline-offset: 1px; }
+
+/* ---------- Laboratório ---------- */
+.lab-late { color: var(--q-danger); }
+
+/* ---------- Imagens ---------- */
+.img-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+.img-card { margin: 0; border: 1px solid var(--q-border); border-radius: 12px; overflow: hidden; background: var(--q-surface); }
+.img-card img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: var(--q-surface-muted); }
+.img-card figcaption { padding: 6px 8px; display: flex; gap: 6px; align-items: center; }
+
+/* ---------- Pediatria (curva de exemplo) ---------- */
+.growth-svg { width: 100%; height: auto; max-height: 280px; }
+.gc-grid { stroke: var(--q-border); stroke-width: 1; }
+.gc-tick { font-size: 11px; fill: var(--q-text-muted); }
+.gc-line { fill: none; stroke: var(--q-primary); stroke-width: 2.5; }
+.gc-pt { fill: var(--q-surface); stroke: var(--q-primary); stroke-width: 2.5; }
+.gc-ex { font-size: 12px; font-weight: 700; fill: var(--q-warning); }

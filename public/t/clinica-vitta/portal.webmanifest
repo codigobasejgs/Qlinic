@@ -1,0 +1,45 @@
+{
+  "id": "/c/clinica-vitta/portal/",
+  "name": "Clínica Vitta",
+  "short_name": "Vitta",
+  "description": "Portal do paciente de Clínica Vitta (demonstração Qlinic).",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "start_url": "/c/clinica-vitta/portal/",
+  "scope": "/c/clinica-vitta/",
+  "display": "standalone",
+  "orientation": "any",
+  "theme_color": "#7C3AED",
+  "background_color": "#F7FAFC",
+  "categories": [
+    "medical",
+    "health",
+    "business"
+  ],
+  "icons": [
+    {
+      "src": "/t/clinica-vitta/icon-192.png?v=1",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/t/clinica-vitta/icon-512.png?v=1",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/t/clinica-vitta/maskable-512.png?v=1",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/t/clinica-vitta/icon.svg?v=1",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

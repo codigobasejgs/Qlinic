@@ -1,0 +1,55 @@
+/* Agenda / recepção / totem / painel — complementa src/styles/app.css com tokens --q-*. */
+.sch-toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end; }
+.sch-toolbar .field { min-width: 150px; flex: 1 1 150px; max-width: 240px; }
+.sch-datenav { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+.sch-datelabel { font-weight: 650; min-width: 0; }
+.cal .cal-corner { position: sticky; left: 0; top: 0; z-index: 6; background: var(--q-surface-muted); border-bottom: 1px solid var(--q-border); border-right: 1px solid var(--q-border); }
+.cal .cal-head { display: flex; flex-direction: column; gap: 2px; align-items: center; justify-content: center; }
+.cal .cal-head .sub { font-weight: 500; color: var(--q-text-muted); font-size: 11px; }
+.cal .cal-head.is-today { color: var(--q-primary-text); }
+.cal-block { position: absolute; left: 0; right: 0; z-index: 1; pointer-events: none; font-size: 11px; color: var(--q-text-muted); padding: 2px 6px; overflow: hidden;
+  background: repeating-linear-gradient(45deg, color-mix(in srgb, var(--q-warning) 14%, transparent) 0 6px, transparent 6px 12px); border-top: 1px solid var(--q-warning); }
+.cal-ev { z-index: 2; }
+.cal-ev .ev-time { font-variant-numeric: tabular-nums; color: var(--q-text-muted); }
+.cal-ev[draggable='true'] { cursor: grab; }
+.cal .cal-cell.drop-target button { background: var(--q-primary-soft); outline: 2px dashed var(--q-primary); outline-offset: -2px; }
+.cal-closed-note { padding: 6px 10px; font-size: 13px; }
+.sch-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.sch-item { width: 100%; text-align: left; display: grid; grid-template-columns: 64px 1fr auto; gap: 4px 12px; align-items: center; padding: 10px 14px; border: 1px solid var(--q-border); border-left: 4px solid var(--pro, var(--q-border)); border-radius: 12px; background: var(--q-surface); cursor: pointer; min-height: 56px; color: var(--q-text); }
+.sch-item:hover { background: var(--q-surface-muted); }
+.sch-item .t { font-variant-numeric: tabular-nums; font-weight: 650; }
+@media (max-width: 520px) { .sch-item { grid-template-columns: 52px 1fr; } .sch-item > :last-child { grid-column: 2; justify-self: start; } }
+.slot-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.slot-chips .chip { min-height: 36px; font-variant-numeric: tabular-nums; }
+@media (pointer: coarse) { .slot-chips .chip { min-height: 44px; } }
+.month-grid .mg-ev { font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.month-grid .mg-closed { background: repeating-linear-gradient(135deg, transparent 0 6px, color-mix(in srgb, var(--q-border) 60%, transparent) 6px 7px); }
+@media (max-width: 600px) { .month-grid > div { min-height: 64px; padding: 4px; } .month-grid .mg-ev { display: none; } }
+.queue-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 12px; align-items: center; padding: 12px 0; }
+.queue-row + .queue-row { border-top: 1px solid var(--q-border); }
+.queue-meta { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 13px; color: var(--q-text-muted); }
+@media (max-width: 600px) { .queue-row { grid-template-columns: 1fr; } }
+.countdown { font-variant-numeric: tabular-nums; font-weight: 700; }
+/* Totem */
+.kiosk-main { flex: 1; display: flex; align-items: center; justify-content: center; padding: 24px 16px; }
+.kiosk-card { width: min(640px, 100%); background: var(--q-surface); border: 1px solid var(--q-border); border-radius: 24px; padding: clamp(20px, 4vw, 40px); display: flex; flex-direction: column; gap: 20px; }
+.kiosk-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 24px; border-bottom: 1px solid var(--q-border); background: var(--q-surface); flex-wrap: wrap; }
+.keypad { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+.keypad.num { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.keypad button { min-height: 64px; font-size: 24px; font-weight: 700; border-radius: 14px; border: 1px solid var(--q-input-border); background: var(--q-surface); color: var(--q-text); cursor: pointer; }
+.keypad button:hover { background: var(--q-surface-muted); }
+.keypad button.wide { grid-column: span 2; font-size: 18px; }
+@media (max-width: 480px) { .keypad { grid-template-columns: repeat(5, minmax(0, 1fr)); } .keypad button { min-height: 52px; font-size: 20px; } }
+.ticket { font-size: clamp(64px, 16vw, 128px); font-weight: 800; letter-spacing: 0.04em; line-height: 1; color: var(--q-primary-text); text-align: center; font-variant-numeric: tabular-nums; }
+/* Painel de chamada (fundo escuro fixo da .call-panel) */
+.call-panel .cp-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 20px 32px; border-bottom: 1px solid rgba(255,255,255,0.12); flex-wrap: wrap; }
+.call-panel .cp-main { flex: 1; display: grid; grid-template-columns: 2fr 1fr; gap: 24px; padding: 32px; }
+.call-panel .cp-now { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 16px; text-align: center; border: 2px solid rgba(94,234,212,0.5); border-radius: 24px; padding: 32px; }
+.call-panel .cp-label { font-size: clamp(16px, 2vw, 22px); text-transform: uppercase; letter-spacing: 0.12em; color: #A7BAC8; font-weight: 700; }
+.call-panel .cp-where { font-size: clamp(22px, 3vw, 36px); font-weight: 650; color: #5EEAD4; }
+.call-panel .cp-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.call-panel .cp-list li { display: flex; justify-content: space-between; gap: 12px; padding: 16px 20px; border-radius: 16px; background: rgba(255,255,255,0.06); font-size: clamp(20px, 2.4vw, 30px); font-weight: 700; }
+.call-panel .cp-list li span:last-child { color: #A7BAC8; font-weight: 500; font-size: 0.7em; align-self: center; }
+@media (max-width: 800px) { .call-panel .cp-main { grid-template-columns: 1fr; padding: 16px; } .call-panel .cp-head { padding: 16px; } }
+@media (prefers-reduced-motion: no-preference) { .call-panel .cp-now.flash { animation: cp-flash 1.2s ease-out 2; } }
+@keyframes cp-flash { 0% { background: rgba(94,234,212,0.25); } 100% { background: transparent; } }

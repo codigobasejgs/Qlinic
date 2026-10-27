@@ -1,0 +1,41 @@
+/* Especialidades — complementos ao app.css (tokens var(--q-*); hex só em ilustrações SVG). */
+.spec .spec-picker { max-width: 560px; }
+.spec input[type='range'] { accent-color: var(--q-primary); width: 100%; min-height: 32px; }
+.spec-chart { width: 100%; height: auto; max-height: 200px; color: var(--q-text); }
+
+/* Internação: mapa de boxes */
+.box-map { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); }
+.box-cell { width: 100%; min-height: 112px; display: flex; flex-direction: column; gap: 4px; align-items: stretch; text-align: left; padding: 12px 14px; border-radius: 12px;
+  border: 1px dashed var(--q-input-border); background: var(--q-surface); color: var(--q-text); cursor: pointer; font: inherit; }
+.box-cell.occupied { border-style: solid; border-color: var(--q-primary); background: var(--q-primary-soft); }
+.box-cell[aria-pressed='true'] { box-shadow: 0 0 0 3px var(--q-focus); }
+.box-cell:disabled { cursor: default; opacity: .8; }
+
+/* Tarefas: estados distintos também por borda/ícone (não só cor) */
+.task-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.task-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 10px 12px; border: 1px solid var(--q-border); border-left-width: 5px; border-radius: 10px; background: var(--q-surface); }
+.task-row .task-time { display: flex; flex-direction: column; font-weight: 700; min-width: 52px; }
+.task-row.st-agendado { border-left-color: var(--q-info); }
+.task-row.st-administrado { border-left-color: var(--q-success); background: color-mix(in srgb, var(--q-success-bg) 45%, var(--q-surface)); }
+.task-row.st-atrasado { border-left-color: var(--q-danger); border-left-style: double; background: color-mix(in srgb, var(--q-danger-bg) 55%, var(--q-surface)); }
+.task-row.st-nao_administrado { border-left-color: var(--q-warning); border-left-style: dashed; }
+.task-row.st-suspenso { border-left-color: var(--q-border); opacity: .75; }
+.task-row.st-suspenso strong { text-decoration: line-through; }
+
+/* Calculadora */
+.calc-result { border: 2px dashed var(--q-primary); border-radius: 12px; padding: 14px 16px; background: var(--q-primary-soft); }
+.calc-value { font-size: 28px; font-weight: 800; color: var(--q-primary-text); }
+
+/* Estética: mapa */
+.body-map { width: 100%; height: 100%; }
+.map-region circle { fill: color-mix(in srgb, var(--q-primary) 14%, transparent); stroke: var(--q-primary); stroke-width: 1.5; stroke-dasharray: 3 3; cursor: pointer; transition: fill var(--q-fast); }
+.map-region:hover circle, .map-region:focus-visible circle { fill: color-mix(in srgb, var(--q-primary) 32%, transparent); }
+.map-region[aria-pressed='true'] circle { fill: color-mix(in srgb, var(--q-primary) 45%, transparent); stroke-dasharray: none; stroke-width: 2.5; }
+.map-region:focus { outline: none; }
+.map-region:focus-visible circle { stroke: var(--q-focus); stroke-width: 3; }
+.map-mark { fill: var(--q-danger); stroke: var(--q-surface); stroke-width: 1.5; pointer-events: none; }
+
+/* Fisioterapia: mídia demonstrativa */
+.ex-media { margin: 0; flex: none; width: 120px; color: var(--q-text-muted); }
+.ex-media svg { width: 120px; height: 80px; }
+@media (max-width: 480px) { .ex-media { width: 88px; } .ex-media svg { width: 88px; height: 60px; } }
