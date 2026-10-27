@@ -1,6 +1,6 @@
 # Arquitetura do frontend Qlinic
 
-> Estado: frontend de demonstração (sem backend). Dados fictícios em `localStorage`. Nada aqui é controle de acesso real.
+> Estado: demonstração usa `localStorage` (dados fictícios, sem controle de acesso real). Ambiente conectado usa Supabase com RLS como fonte da verdade — ver `BACKEND_SUPABASE.md`.
 
 ## Stack
 React 19 · TypeScript 6 (strict) · Vite 8 · react-router 7 · lucide-react · Vitest · Playwright (QA). Gerenciador: npm (`package-lock.json`).

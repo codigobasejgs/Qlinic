@@ -1,8 +1,12 @@
-# Qlinic — frontend de demonstração
+# Qlinic
 
 ERP SaaS multi-tenant e multiunidade para odontologia, medicina ambulatorial, veterinária, estética, psicologia, fisioterapia e nutrição.
-**Esta versão é um frontend de demonstração**: dados fictícios no navegador, integrações simuladas, sem backend, sem autenticação, cobrança ou envio reais.
-Não é um sistema pronto para operar com pacientes reais. Nome e marca “Qlinic” são provisórios (disponibilidade não verificada).
+Dois ambientes no mesmo build:
+- **Demonstração** (`/demonstracao`): dados fictícios no navegador, integrações simuladas.
+- **Conectado** (`/auth/login`, quando `VITE_SUPABASE_*` está definido): Supabase Auth + Postgres com RLS, IA (Gemini) e WhatsApp (Evolution) reais via Edge Functions. Ver `docs/BACKEND_SUPABASE.md`.
+
+Ainda simulados no conectado (dependem de contrato): pagamentos, e-mail transacional, worker da fila de mensagens, assinatura eletrônica, TISS, NFS-e, push, armazenamento de arquivos.
+Antes de operar com pacientes reais: revisão jurídica/LGPD e auditoria de segurança. Nome e marca “Qlinic” são provisórios.
 
 ## Requisitos
 Node 22+ e npm 10+. (Para regenerar ícones PWA e rodar E2E: `npx playwright install chromium`.)
