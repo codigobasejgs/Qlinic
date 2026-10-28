@@ -16,4 +16,4 @@ Nada desta lista se resolve só com código. Enquanto houver item aberto, a jorn
 9. **Resend** (domínio verificado) e **Evolution** (instância da plataforma) para as notificações, sem CPF e com link autenticado.
 
 ## Backend
-10. Tabelas, RLS, storage privado e Edge Functions descritos em `MODELO_SUPABASE.md`. No ambiente conectado, `/contratar` mostra “em preparação” e não grava dado real no navegador.
+10. Tabelas, RLS, storage privado e Edge Functions descritos em `MODELO_SUPABASE.md`. Já existe a solicitação de contratação (`saas_contract_requests` + RPC `request_saas_contract`, migrações 0009/0010); faltam envelope de assinatura, cobrança, ativação e o painel interno para tratar as solicitações.

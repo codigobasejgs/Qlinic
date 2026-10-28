@@ -1,9 +1,10 @@
 // Site comercial: Landing, Segmento, Planos, Recursos.
-import { useState, type FormEvent } from 'react'
-import { Link, useParams } from 'react-router'
+import { lazy, Suspense, useState, type FormEvent } from 'react'
+import { Link, useParams, useSearchParams } from 'react-router'
 import { Activity, Apple, ArrowRight, Brain, PawPrint, Smile, Sparkles, Stethoscope, Smartphone, Share, RefreshCw, Globe, MonitorSmartphone, Gauge, type LucideIcon } from 'lucide-react'
 import { platformDb, usePlatformCollection } from '@/data/store'
 import type { Segment } from '@/domain/types'
+import type { BillingCycle } from '@/domain/platform'
 import { nowISO } from '@/lib/dates'
 import { uid } from '@/lib/util'
 import { Alert, Badge, Button, ButtonLink, Field, Input, Select, SimBadge, Textarea } from '@/ui/core'
@@ -271,16 +272,40 @@ export function SegmentPage() {
 }
 
 // ---------- Planos ----------
+const PlanCheckout = lazy(() => import('@/modules/contracts/planCheckout').then((m) => ({ default: m.PlanCheckout })))
+const CYCLE_KEYS: BillingCycle[] = ['mensal', 'trimestral', 'anual']
+
+/** /planos é a página canônica: escolha do plano e, abaixo, formulário + contrato do plano. Estado comercial na URL, nunca dado pessoal. */
 export function PlansPage() {
+  const [sp, setSp] = useSearchParams()
+  const plans = usePlatformCollection('plans')
+  const planId = sp.get('plano')
+  const cycle = CYCLE_KEYS.includes(sp.get('ciclo') as BillingCycle) ? (sp.get('ciclo') as BillingCycle) : 'mensal'
+  const valid = !!planId && plans.some((p) => p.id === planId && p.active)
+  const update = (next: { plano?: string | null; ciclo?: BillingCycle }, replace = false) => {
+    const n = new URLSearchParams()
+    const p = next.plano === undefined ? planId : next.plano
+    if (p) n.set('plano', p)
+    n.set('ciclo', next.ciclo ?? cycle)
+    setSp(n, { replace, preventScrollReset: true })
+    if (p) history.replaceState(history.state, '', `${location.pathname}?${n}#contratacao`)
+  }
   return (
     <SiteLayout title="Planos">
       <section className="hero container stack" style={{ '--gap': '12px' } as React.CSSProperties}>
         <h1>Planos e limites</h1>
         <p className="lead">Escolha pelo tamanho da equipe e pelas unidades. Todos os planos têm franquias de consumo; o excedente é cobrado por unidade.</p>
       </section>
-      <section className="container" style={{ paddingBottom: 64 }} aria-label="Comparativo de planos">
-        <PlansCompare />
+      <section className="container" style={{ paddingBottom: 32 }} aria-label="Comparativo de planos" id="planos-lista">
+        <PlansCompare cycle={cycle} onCycle={(c) => update({ ciclo: c }, true)} onChoose={(id) => update({ plano: id })} selectedId={valid ? planId : null} />
       </section>
+      {planId && (
+        <Suspense fallback={<div className="container"><div className="skeleton" style={{ height: 240 }} /></div>}>
+          <PlanCheckout plans={plans.filter((p) => p.active)} planId={valid ? planId : null} invalidPlan={!valid} cycle={cycle}
+            onCycle={(c) => update({ ciclo: c }, true)}
+            onChangePlan={() => { document.getElementById('planos-lista')?.scrollIntoView({ block: 'start' }); document.querySelector<HTMLElement>('#planos-lista button, #planos-lista a')?.focus({ preventScroll: true }) }} />
+        </Suspense>
+      )}
       <Transparency />
     </SiteLayout>
   )

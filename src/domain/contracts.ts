@@ -144,14 +144,19 @@ export const emptySignatory = (): ContractorSignatory => ({ name: '', document: 
 
 export const UFS = ['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO']
 const MAX = 120
-const demoEmail = (e: string) => /^[^\s@]+@[^\s@]+\.(test|exemplo)$/i.test(e.trim())
+const demoEmailOk = (e: string) => /^[^\s@]+@[^\s@]+\.(test|exemplo)$/i.test(e.trim())
 /** Simulação: só documentos fictícios (CPF 000…, CNPJ 00.000…) para nunca guardar dado real no navegador. */
-const fakeCpfOk = (d: string) => d.startsWith('000')
-const fakeCnpjOk = (d: string) => d.startsWith('00000')
+const demoCpf = (d: string) => d.startsWith('000')
+const demoCnpj = (d: string) => d.startsWith('00000')
+/** Erros que indicam dado com aparência real na demonstração (não pode ser salvo no navegador). */
+export const looksReal = (errs: Record<string, string>) => Object.values(errs).some((m) => m.startsWith('Na simulação'))
 
 /** Validação de formato/dígitos. NÃO verifica identidade nem poderes. Erros por campo (para aria-describedby). */
-export function validateParties(c: ContractorParty, s: ContractorSignatory, maxUnits: number): Record<string, string> {
+export function validateParties(c: ContractorParty, s: ContractorSignatory, maxUnits: number, demo = true): Record<string, string> {
   const e: Record<string, string> = {}
+  const demoEmail = (v: string) => (demo ? demoEmailOk(v) : /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()))
+  const fakeCpfOk = (d: string) => !demo || demoCpf(d)
+  const fakeCnpjOk = (d: string) => !demo || demoCnpj(d)
   const doc = c.document.replace(/\D/g, '')
   const len = (k: string, v: string, min: number, label: string) => { const t = v.trim(); if (t.length < min) e[k] = `Informe ${label}.`; else if (t.length > MAX) e[k] = `${label[0].toUpperCase()}${label.slice(1)}: máximo ${MAX} caracteres.` }
   len('legalName', c.legalName, 3, c.kind === 'pj' ? 'a razão social' : 'o nome civil completo')
@@ -173,10 +178,10 @@ export function validateParties(c: ContractorParty, s: ContractorSignatory, maxU
   len('district', a.district, 2, 'o bairro')
   len('city', a.city, 2, 'a cidade')
   if (!UFS.includes(a.uf.toUpperCase())) e.uf = 'Selecione a UF.'
-  if (!demoEmail(c.email)) e.email = 'Na simulação use e-mail fictício terminado em .test ou .exemplo.'
+  if (!demoEmail(c.email)) e.email = demo ? 'Na simulação use e-mail fictício terminado em .test ou .exemplo.' : 'E-mail inválido.'
   const ph = c.phone.replace(/\D/g, '')
   if (ph.length < 10 || ph.length > 11) e.phone = 'Telefone com DDD (10 ou 11 dígitos).'
-  else if (!ph.startsWith('00')) e.phone = 'Na simulação use telefone fictício com DDD 00.'
+  else if (demo && !ph.startsWith('00')) e.phone = 'Na simulação use telefone fictício com DDD 00.'
   if (c.kind === 'pj') {
     len('sigName', s.name, 5, 'o nome completo do representante')
     if (!/\s/.test(s.name.trim()) && !e.sigName) e.sigName = 'Informe nome e sobrenome.'
@@ -184,7 +189,7 @@ export function validateParties(c: ContractorParty, s: ContractorSignatory, maxU
     if (!isValidCPF(sd)) e.sigDocument = 'CPF do representante inválido.'
     else if (!fakeCpfOk(sd)) e.sigDocument = 'Na simulação use CPF fictício iniciado por 000.'
     len('sigRole', s.role, 3, 'o cargo ou qualidade')
-    if (!demoEmail(s.email)) e.sigEmail = 'Na simulação use e-mail fictício terminado em .test ou .exemplo.'
+    if (!demoEmail(s.email)) e.sigEmail = demo ? 'Na simulação use e-mail fictício terminado em .test ou .exemplo.' : 'E-mail inválido.'
   }
   return e
 }
@@ -355,7 +360,9 @@ export function parseBody(body: string): DocSection[] {
   return out
 }
 
-const fmtDoc = (c: ContractorParty) => (c.kind === 'pj' ? maskCNPJ(c.document) : maskCPF(c.document))
+/** Máscara que preserva o marcador de pendência da prévia. */
+const mk = (fn: (v: string) => string) => (v: string) => (/⟨[^⟩]*⟩/.test(v) ? v : fn(v))
+const fmtDoc = (c: ContractorParty) => (c.kind === 'pj' ? mk(maskCNPJ)(c.document) : mk(maskCPF)(c.document))
 const yes = (n: number, unit: string) => (n > 0 ? `${n.toLocaleString('pt-BR')} ${unit}` : 'não incluído')
 
 export interface RenderInput {
@@ -376,16 +383,16 @@ export function renderContract(r: RenderInput): DocSection[] {
   const sig = p.authorizedSignatory ? `${p.authorizedSignatory.name}, ${p.authorizedSignatory.role}` : 'a ser identificado no processo de assinatura (não definido no cadastro da contratada; nenhuma assinatura, procuração ou representação é presumida)'
   const kindLabel = c.kind === 'pj' ? 'pessoa jurídica' : 'profissional pessoa física'
   const a = c.address
-  const addr = `${a.street}, nº ${a.number}${a.complement ? `, ${a.complement}` : ''}, ${a.district}, ${a.city}/${a.uf.toUpperCase()}, CEP ${maskCEP(a.cep)}`
+  const addr = `${a.street}, nº ${a.number}${a.complement ? `, ${a.complement}` : ''}, ${a.district}, ${a.city}/${mk((x) => x.toUpperCase())(a.uf)}, CEP ${mk(maskCEP)(a.cep)}`
   const ident: DocSection = {
     id: 'identificacao', title: r.kind === 'aditivo' ? 'Aditivo contratual — quadro de identificação' : 'Quadro de identificação', paras: [
       `Número do contrato: ${r.number}. Versão do modelo: ${r.templateVersion}. Oferta: ${o.offerVersion}. Data: a da conclusão das manifestações de vontade das partes, conforme o registro do processo de assinatura.`,
       ...(r.kind === 'aditivo' ? [`Este aditivo integra o contrato ${r.amendsNumber ?? 'anterior'} e altera somente: ${r.amendmentNote ?? 'condições indicadas no Anexo A'}. As demais condições do contrato anterior permanecem inalteradas.`] : []),
       `CONTRATADA: ${p.legalName}, ${p.legalNature.toLowerCase().includes('individual') ? 'empresário individual' : p.legalNature}, inscrito no CNPJ sob nº ${maskCNPJ(p.taxId)}, com endereço na ${providerAddress(p)}, fornecedora da plataforma denominada ${p.productName}. E-mail cadastral: ${p.registeredEmail}. Telefone cadastral: ${formatPhoneE164(p.registeredPhone)}. Signatário da contratada: ${sig}.`,
       `${p.productName} é a denominação do produto neste instrumento, não substitui o nome empresarial acima nem representa declaração de registro de marca. O comprovante apresentado não informa nome fantasia. Nenhuma assinatura, procuração ou autorização de representação foi presumida.`,
-      `CONTRATANTE: ${c.legalName.trim()}, ${kindLabel}, inscrito no ${c.kind === 'pj' ? 'CNPJ' : 'CPF'} nº ${fmtDoc(c)}, com endereço em ${addr}, e-mail ${c.email.trim()}, telefone ${maskPhone(c.phone)}. Estabelecimento identificado comercialmente como ${c.tradeName.trim() || c.legalName.trim()}, segmento ${c.segment ? SEGMENT_LABEL[c.segment] : 'não informado'}, unidades abrangidas: ${c.units}.`,
+      `CONTRATANTE: ${c.legalName.trim()}, ${kindLabel}, inscrito no ${c.kind === 'pj' ? 'CNPJ' : 'CPF'} nº ${fmtDoc(c)}, com endereço em ${addr}, e-mail ${c.email.trim()}, telefone ${mk(maskPhone)(c.phone)}. Estabelecimento identificado comercialmente como ${c.tradeName.trim() || c.legalName.trim()}, segmento ${c.segment ? SEGMENT_LABEL[c.segment] : PENDING('Selecione o segmento acima')}, unidades abrangidas: ${c.units}.`,
       c.kind === 'pj'
-        ? `Representante/signatário do contratante: ${s.name.trim()}, CPF ${maskCPF(s.document)}, cargo ou qualidade ${s.role.trim()}, e-mail de assinatura ${s.email.trim()}. O signatário declara possuir poderes para contratar, sujeitos a verificação quando necessária.`
+        ? `Representante/signatário do contratante: ${s.name.trim()}, CPF ${mk(maskCPF)(s.document)}, cargo ou qualidade ${s.role.trim()}, e-mail de assinatura ${s.email.trim()}. O signatário declara possuir poderes para contratar, sujeitos a verificação quando necessária.`
         : `Signatário: o próprio contratante, ${s.name}, em nome próprio, e-mail de assinatura ${s.email}.`,
     ],
   }
@@ -400,7 +407,8 @@ export function renderContract(r: RenderInput): DocSection[] {
       ['Franquias', `mensagens: ${yes(o.limits.messagesMonth, 'por mês')}; IA: ${yes(o.limits.aiCreditsMonth, 'créditos por mês')}; assinaturas eletrônicas: ${yes(t.signaturesIncluded, 'por mês')}`],
       ['Ciclo', CYCLE_NAME[o.cycle]],
       ['Valor total do ciclo', o.billing === 'proxima_fatura' ? `${formatBRL(o.totalCents)} (ajuste aplicado a partir da próxima fatura)` : formatBRL(o.totalCents)],
-      ['Equivalente mensal (informativo)', formatBRL(o.monthlyEqCents)],
+      ['Equivalente mensal (informativo)', o.cycle === 'mensal' ? 'não se aplica (ciclo mensal)' : `${formatBRL(o.monthlyEqCents)} — apenas referência; a cobrança é do valor total do ciclo`],
+      ['Parcelamento', 'não se aplica: periodicidade da assinatura não é parcelamento'],
       ['Implantação/importação', o.setupFeeCents > 0 ? formatBRL(o.setupFeeCents) : 'não cobrada'],
       ['Desconto', o.discountText],
       ['Preço após o desconto', o.afterDiscountText],
@@ -424,9 +432,33 @@ export function renderContract(r: RenderInput): DocSection[] {
   return [ident, annexA, ...body]
 }
 
+/** Marcador visível de campo ainda não preenchido na prévia (nunca vai para documento congelado: findPlaceholders o rejeita). */
+export const PENDING = (msg: string) => `⟨${msg}⟩`
+const PENDING_RE = /⟨[^⟩]*⟩/
+
+/** Prévia ao vivo: mesmos dados do formulário, com indicação amigável no lugar do que falta. */
+export function previewParties(c: ContractorParty, s: ContractorSignatory): { contractor: ContractorParty; signatory: ContractorSignatory } {
+  const v = (x: string, msg: string) => (x.trim() ? x : PENDING(msg))
+  const pj = c.kind === 'pj'
+  const a = c.address
+  const contractor: ContractorParty = {
+    ...c,
+    legalName: v(c.legalName, pj ? 'Informe a razão social acima' : 'Informe seu nome completo acima'),
+    document: c.document.replace(/\D/g, '').length === (pj ? 14 : 11) ? c.document : PENDING(pj ? 'Informe o CNPJ acima' : 'Informe o CPF acima'),
+    email: v(c.email, 'Informe o e-mail acima'),
+    phone: c.phone.replace(/\D/g, '').length >= 10 ? c.phone : PENDING('Informe o telefone acima'),
+    address: { ...a, street: v(a.street, 'Informe o logradouro acima'), number: v(a.number, 'número'), district: v(a.district, 'bairro'), city: v(a.city, 'cidade'), uf: v(a.uf, 'UF'), cep: a.cep.replace(/\D/g, '').length === 8 ? a.cep : PENDING('CEP') },
+  }
+  const signatory: ContractorSignatory = pj
+    ? { name: v(s.name, 'Informe o representante acima'), document: s.document.replace(/\D/g, '').length === 11 ? s.document : PENDING('Informe o CPF do representante'), role: v(s.role, 'cargo ou qualidade'), email: v(s.email, 'e-mail de assinatura') }
+    : selfSignatory(contractor)
+  return { contractor, signatory }
+}
+export const isPending = (v: string) => PENDING_RE.test(v)
+
 /** Resquícios proibidos no documento final. */
 export function findPlaceholders(sections: DocSection[]): string[] {
-  const bad = /\[[^\]]*\]|\{\{[^}]*\}\}|\bundefined\b|\bnull\b|\bNaN\b|a definir/i
+  const bad = /\[[^\]]*\]|\{\{[^}]*\}\}|⟨[^⟩]*⟩|\bundefined\b|\bnull\b|\bNaN\b|a definir/i
   const out: string[] = []
   for (const s of sections) for (const v of [s.title, ...s.paras, ...(s.rows ?? []).flat()]) { const m = v.match(bad); if (m) out.push(`${s.title}: “${m[0]}”`) }
   return out

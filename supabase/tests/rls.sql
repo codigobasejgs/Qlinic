@@ -166,9 +166,48 @@ select pg_temp.check('Suporte NÃO lê prontuário', (select count(*) from publi
 select pg_temp.check('Suporte NÃO lê pacientes', (select count(*) from public.patients) = 0);
 reset role;
 
+-- ===== Solicitação de contratação SaaS (0009) =====
+insert into public.platform_documents (collection, id, data) values
+  ('plans', 'rls_plan', '{"id":"rls_plan","name":"Plano RLS","active":true,"version":3,"prices":{"mensal":12345,"trimestral":30000,"anual":100000},"limits":{"units":1},"modules":["agenda"],"overage":{}}'),
+  ('plans', 'rls_plan_off', '{"id":"rls_plan_off","name":"Inativo","active":false,"version":1,"prices":{"mensal":100},"limits":{},"modules":[],"overage":{}}')
+  on conflict (collection, id) do update set data = excluded.data;
+create or replace function pg_temp.req(p_tenant text, p_plan text, p_key text, p_total bigint default 12345) returns jsonb language sql as $$
+  select public.request_saas_contract(p_plan, 'mensal', false, p_tenant,
+    '{"kind":"pj","legalName":"Clínica Teste","document":"00000000000191","email":"a@rls.test"}'::jsonb,
+    '{"name":"Rep Teste","email":"r@rls.test"}'::jsonb, 1, 'hash', '{"terms":true,"powers":true,"privacyNotice":true}'::jsonb, p_total, p_key)
+$$;
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000a1');
+do $$ begin perform pg_temp.req('rls_a', 'rls_plan', 'chave-idempotente-0009', 1); perform pg_temp.check('Contratação: total divergente do catálogo recusado', false);
+exception when raise_exception then perform pg_temp.check('Contratação: total divergente do catálogo recusado', true); end $$;
+select pg_temp.check('Contratação: preço vem do catálogo no servidor', (pg_temp.req('rls_a', 'rls_plan', 'chave-idempotente-0001', 12345) ->> 'total_cents')::bigint = 12345);
+select pg_temp.check('Contratação: duplo envio devolve a mesma solicitação', (pg_temp.req('rls_a', 'rls_plan', 'chave-idempotente-0001') ->> 'existing')::boolean and (select count(*) from public.saas_contract_requests where tenant_id = 'rls_a') = 1);
+select pg_temp.check('Contratação: solicitação nunca nasce assinada', (select bool_and(status = 'solicitado') from public.saas_contract_requests));
+do $$ begin perform pg_temp.req('rls_a', 'rls_plan_off', 'chave-idempotente-0002'); perform pg_temp.check('Contratação: plano inativo recusado', false);
+exception when raise_exception then perform pg_temp.check('Contratação: plano inativo recusado', true); end $$;
+do $$ begin insert into public.saas_contract_requests (user_id, kind, plan_id, cycle, offer, client_total_cents, contractor, signatory, template_version, document_hash, acceptances, idempotency_key)
+  values ('00000000-0000-0000-0000-0000000000a1', 'nova', 'rls_plan', 'mensal', '{}', 1, '{}', '{}', 1, 'h', '{}', 'direto-sem-rpc-0001');
+  perform pg_temp.check('Contratação: INSERT direto bloqueado', false);
+exception when insufficient_privilege then perform pg_temp.check('Contratação: INSERT direto bloqueado', true); end $$;
+reset role;
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000a2');
+do $$ begin perform pg_temp.req('rls_a', 'rls_plan', 'chave-idempotente-0003'); perform pg_temp.check('Contratação: recepção não contrata pela clínica', false);
+exception when insufficient_privilege then perform pg_temp.check('Contratação: recepção não contrata pela clínica', true); end $$;
+select pg_temp.check('Contratação: recepção não lê solicitação da clínica', (select count(*) from public.saas_contract_requests) = 0);
+reset role;
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000b1');
+select pg_temp.check('Contratação: B não lê solicitação de A', (select count(*) from public.saas_contract_requests where tenant_id = 'rls_a') = 0);
+do $$ begin perform pg_temp.req('rls_a', 'rls_plan', 'chave-idempotente-0004'); perform pg_temp.check('Contratação: B não contrata por A', false);
+exception when insufficient_privilege then perform pg_temp.check('Contratação: B não contrata por A', true); end $$;
+reset role;
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000d1');
+select pg_temp.check('Contratação: suporte não lê solicitações (CPF)', (select count(*) from public.saas_contract_requests) = 0);
+reset role;
+
 -- ===== Anônimo =====
 set local role anon;
 select pg_temp.check('Anônimo não lê tabelas', (select count(*) from information_schema.table_privileges where grantee = 'anon' and table_schema = 'public' and table_name in ('patients', 'clinical_records', 'charges')) = 0);
+do $$ begin perform public.request_saas_contract('rls_plan', 'mensal', false, null, '{}', '{}', 1, 'h', '{}', 1, 'chave-anonima-00001'); perform pg_temp.check('Anônimo não envia solicitação de contratação', false);
+exception when insufficient_privilege then perform pg_temp.check('Anônimo não envia solicitação de contratação', true); end $$;
 select pg_temp.check('Anônimo lê página pública (RPC)', (select public.public_clinic('rls-clinica-a') ->> 'org') is not null);
 select pg_temp.check('Anônimo: RPC pública não expõe pacientes', position('Paciente' in public.public_clinic('rls-clinica-a')::text) = 0);
 reset role;

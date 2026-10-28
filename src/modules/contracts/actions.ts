@@ -13,7 +13,7 @@ import { isConnectedEnv } from '@/lib/env'
 import { addDaysCivil, nowISO, todayCivil } from '@/lib/dates'
 import { sha256Hex } from '@/lib/sha256'
 import { uid } from '@/lib/util'
-import { cancelSubscription, changePlan, logAudit, type Actor } from '@/modules/platform/actions'
+import { cancelSubscription, changeCycle, changePlan, logAudit, type Actor } from '@/modules/platform/actions'
 import { nextInvoiceNumber } from '@/modules/platform/metrics'
 import { saveProfile } from '@/modules/settings/lib'
 import { signatureProvider } from './signature'
@@ -48,14 +48,20 @@ function fingerprint(c: Pick<SaasContract, 'offer' | 'contractor' | 'signatory' 
 }
 
 // ---------------- rascunho ----------------
-export interface DraftInput { planId: string; cycle: BillingCycle; trial: boolean; contractor: ContractorParty; signatory: ContractorSignatory; marketing?: boolean }
+/** tenantId: contratação feita por clínica existente (proprietário autorizado) → vira alteração de plano, nunca 2ª assinatura. */
+export interface DraftInput { planId: string; cycle: BillingCycle; trial: boolean; contractor: ContractorParty; signatory: ContractorSignatory; marketing?: boolean; tenantId?: string | null }
+
+/** Assinatura SaaS vigente da clínica (bloqueia segunda assinatura). */
+export const liveSubscription = (tenantId: string) => platformDb.list('subscriptions').find((s) => s.tenantId === tenantId && ['ativa', 'trial', 'inadimplente', 'pausada'].includes(s.status))
 
 /** Salvamento explícito. Mudança após a revisão volta a rascunho e descarta aceites (nova revisão). */
 export function saveDraft(draftKey: string, input: DraftInput, id?: string): SaasContract {
   const p = plan(input.planId)
   const terms = currentTerms()
   const tpl = currentTemplate()
-  const offer = buildOffer(p, terms, input.cycle, input.trial, todayCivil())
+  const live = input.tenantId ? liveSubscription(input.tenantId) : undefined
+  if (live && live.planId === input.planId && live.cycle === input.cycle && live.status === 'ativa') throw new Error('Este já é o plano e o ciclo atuais da clínica.')
+  const offer = buildOffer(p, terms, input.cycle, live ? false : input.trial, todayCivil(), live ? 'proxima_fatura' : undefined)
   const signatory = input.contractor.kind === 'pf' ? selfSignatory(input.contractor) : input.signatory
   const data = { offer, contractor: input.contractor, signatory, templateId: tpl.templateId, templateVersion: tpl.version }
   if (id) {
@@ -69,8 +75,9 @@ export function saveDraft(draftKey: string, input: DraftInput, id?: string): Saa
   }
   const at = nowISO()
   const c: SaasContract = {
-    id: uid('ctr_'), number: nextNumber(), kind: 'contrato', draftKey, tenantId: null, revision: 1, ...data, provider: null, acceptances: { marketing: input.marketing },
-    status: 'draft', payment: { status: 'not_created', provider: terms.gateway, amountCents: offer.totalCents, attempts: 0, processedEvents: [] }, saasStatus: 'pending_activation',
+    id: uid('ctr_'), number: nextNumber(), kind: live ? 'aditivo' : 'contrato', draftKey, tenantId: input.tenantId ?? null, revision: 1, ...data, provider: null, acceptances: { marketing: input.marketing },
+    ...(live ? { amendmentNote: `alteração de plano/ciclo para ${p.name} ${input.cycle}, solicitada pelo proprietário da clínica`, amendsContractId: platformDb.list('saasContracts').find((x) => x.tenantId === input.tenantId && x.kind === 'contrato' && x.status === 'signed')?.id } : {}),
+    status: 'draft', payment: { status: 'not_created', provider: terms.gateway, amountCents: live ? 0 : offer.totalCents, attempts: 0, processedEvents: [] }, saasStatus: 'pending_activation',
     createdAt: at, updatedAt: at, events: [{ at, type: 'rascunho', detail: 'Rascunho criado (simulação).', by: 'Contratante' }], simulated: true,
   }
   platformDb.insert('saasContracts', c)
@@ -229,6 +236,8 @@ export function tryActivate(id: string): SaasContract | null {
   if (!canActivate(c)) return null
   if (c.kind === 'aditivo') {
     if (c.tenantId && platformDb.list('organizations').find((o) => o.id === c.tenantId)?.planId !== c.offer.planId) changePlan(c.tenantId, c.offer.planId, SYS)
+    const live = c.tenantId ? liveSubscription(c.tenantId) : undefined
+    if (live && live.cycle !== c.offer.cycle) changeCycle(live.id, c.offer.cycle, SYS)
     return patch(id, { saasStatus: 'active' }, { type: 'ativacao', detail: 'Aditivo vigente: plano ajustado; diferença na próxima fatura.', by: 'Sistema' })
   }
   if (isConnectedEnv()) return null // ponytail: ativação real exige backend de contratação; ambiente conectado não cria tenant a partir da simulação.

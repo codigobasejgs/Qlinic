@@ -8,7 +8,6 @@ const NAV = [
   { to: '/#segmentos', label: 'Segmentos', match: '/segmentos' },
   { to: '/recursos', label: 'Recursos', match: '/recursos' },
   { to: '/planos', label: 'Planos', match: '/planos' },
-  { to: '/contrato', label: 'Contrato', match: '/contrato' },
   { to: '/ajuda', label: 'Ajuda', match: '/ajuda' },
 ]
 
@@ -68,7 +67,6 @@ export function SiteLayout({ title, children }: { title: string; children: React
           <nav aria-label="Rodapé" className="pub-foot-links">
             <Link to="/recursos">Recursos</Link>
             <Link to="/planos">Planos</Link>
-            <Link to="/contrato">Contrato</Link>
             <Link to="/ajuda">Central de ajuda</Link>
             <Link to="/demonstracao">Demonstração</Link>
             <Link to="/demonstracao/identidade">Identidade visual</Link>

@@ -2,11 +2,11 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { createHash } from 'node:crypto'
 import { platformDb } from '@/data/store'
-import { applyEnvelopeEvent, applyPaymentEvent, emptyContractor, emptySignatory, findPlaceholders, maskSectionsCpf, validateParties, type ContractorParty } from '@/domain/contracts'
+import { applyEnvelopeEvent, applyPaymentEvent, buildOffer, emptyContractor, emptySignatory, findPlaceholders, maskSectionsCpf, previewParties, renderContract, validateParties, type ContractorParty } from '@/domain/contracts'
 import { sha256Hex } from '@/lib/sha256'
 import { formatBRL } from '@/lib/money'
 import { fakeCNPJ, fakeCPF, isValidCNPJ } from '@/lib/util'
-import { acceptAndSign, freezeForReview, getContract, legalProfile, publishTemplate, reviseAfterSending, saveDraft, simulateEnvelope, startPayment, paymentEvent, reconcilePayment, currentTemplate } from './actions'
+import { acceptAndSign, freezeForReview, getContract, legalProfile, publishTemplate, reviseAfterSending, saveDraft, simulateEnvelope, startPayment, paymentEvent, reconcilePayment, currentTemplate, currentTerms } from './actions'
 
 const store: Record<string, string> = {}
 globalThis.sessionStorage = { getItem: (k: string) => store[k] ?? null, setItem: (k: string, v: string) => { store[k] = v }, removeItem: (k: string) => { delete store[k] } } as Storage
@@ -158,6 +158,47 @@ describe('eventos', () => {
     expect(applyEnvelopeEvent(env, { eventId: 'x', envelopeId: 'e1', contractId: 'c1', type: 'sent', occurredAt: '' }).env.status).toBe('completed')
     expect(applyEnvelopeEvent({ ...env, status: 'sent' }, { eventId: 'y', envelopeId: 'e1', contractId: 'OUTRO', type: 'expired', occurredAt: '' }).result).toBe('ignorado')
     expect(applyPaymentEvent({ status: 'confirmed', provider: 'asaas', amountCents: 1, attempts: 1, processedEvents: [] }, { eventId: 'z', type: 'failed', at: '' }).payment.status).toBe('confirmed')
+  })
+})
+
+describe('prévia ao vivo em /planos', () => {
+  const sections = (c: ContractorParty, s = emptySignatory()) => {
+    const p = previewParties(c, s)
+    return renderContract({ number: 'x', kind: 'contrato', templateVersion: 1, templateBody: currentTemplate().body, offer: buildOffer(platformDb.list('plans').find((x) => x.id === 'plan_pro')!, currentTerms(), 'anual', false, '2026-10-28'), contractor: p.contractor, signatory: p.signatory, provider: legalProfile() })
+  }
+  it('formulário vazio: indicações amigáveis, nunca null/undefined/empresa fictícia', () => {
+    const txt = JSON.stringify(sections(emptyContractor()))
+    expect(txt).toContain('Informe a razão social acima')
+    expect(txt).not.toMatch(/undefined|null|NaN|fictícia/)
+    expect(findPlaceholders(sections(emptyContractor())).length).toBeGreaterThan(0) // bloqueia assinatura
+  })
+  it('dados preenchidos aparecem no contrato; completo não tem pendências', () => {
+    const s = sections(pj(), sig())
+    expect(JSON.stringify(s)).toContain('Clínica Teste Ltda.')
+    expect(findPlaceholders(s)).toEqual([])
+  })
+  it('PF em nome próprio não pede representante', () => {
+    const pf: ContractorParty = { ...pj(), kind: 'pf', legalName: 'Bruno Exemplo', tradeName: '', document: fakeCPF(9).replace(/\D/g, '') }
+    const txt = JSON.stringify(sections(pf))
+    expect(txt).toContain('o próprio contratante, Bruno Exemplo')
+    expect(txt).not.toContain('Informe o representante')
+  })
+  it('ambiente real aceita dados reais (sem exigir domínio .test)', () => {
+    expect(validateParties({ ...pj(), document: '59760458000191', email: 'a@gmail.com', phone: '(11) 3621-8304' }, { ...sig(), email: 'b@gmail.com' }, 2, false)).toEqual({})
+  })
+  it('clínica com assinatura ativa gera aditivo, não segunda assinatura', () => {
+    const c = saveDraft('k-org', { planId: 'plan_rede', cycle: 'mensal', trial: true, contractor: pj(), signatory: sig(), tenantId: 'org_vitta' })
+    expect(c.kind).toBe('aditivo')
+    expect(c.offer.billing).toBe('proxima_fatura')
+    expect(c.offer.trial).toBeNull()
+    const cur = platformDb.list('subscriptions').find((s) => s.tenantId === 'org_vitta')!
+    expect(() => saveDraft('k-org', { planId: cur.planId, cycle: cur.cycle, trial: false, contractor: pj(), signatory: sig(), tenantId: 'org_vitta' })).toThrow(/plano e o ciclo atuais/)
+    const before = platformDb.list('subscriptions').filter((s) => s.tenantId === 'org_vitta').length
+    let a = acceptAndSign(freezeForReview(c.id, 'k-org').id, 'k-org', ACC)
+    a = simulateEnvelope(a.id, 'sign_provider', actor).contract
+    expect(a.saasStatus).toBe('active')
+    expect(platformDb.list('subscriptions').filter((s) => s.tenantId === 'org_vitta').length).toBe(before)
+    expect(platformDb.list('organizations').find((o) => o.id === 'org_vitta')!.planId).toBe('plan_rede')
   })
 })
 

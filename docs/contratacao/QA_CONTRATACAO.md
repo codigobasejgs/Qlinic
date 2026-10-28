@@ -1,3 +1,5 @@
+> **Histórico (commit d405006).** A jornada em /contrato e /contratar foi substituída pela contratação dentro de /planos. Relatório atual: QA_CONTRATO_NOS_PLANOS.md.
+
 # QA — contratação, contrato e assinatura do SaaS
 
 Data: 28/10/2026. Ambiente: build de produção (`vite preview`), Chromium desktop 1440×900 e Pixel 7, além de viewports de 360 e 390 px.

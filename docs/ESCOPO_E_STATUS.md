@@ -151,10 +151,10 @@ Estados: **não iniciado** · **frontend implementado** (código pronto, sem ver
 ## Contratação SaaS (complemento v1.0 — 28/10/2026)
 | Req. | Item | Rota/ambiente | Estado | Evidência | Dependência externa |
 |---|---|---|---|---|---|
-| C1 | Página pública do contrato (modelo vigente, contratada, sem dados de clientes) | `/contrato` | frontend validado | E2E `contracts.spec.ts` | revisão jurídica |
-| C2 | Jornada plano → dados → revisão → assinatura → pagamento → onboarding | `/contratar?plano=` | frontend validado | E2E + unit `contracts.test.ts` | provedor de assinatura, gateway |
+| C1 | Contrato dentro da escolha do plano (formulário + contrato ao vivo, 4 blocos); `/contrato` e `/contratar` redirecionam | `/planos?plano=&ciclo=#contratacao` | frontend validado | E2E `contracts.spec.ts` (12), `qa/connected-plans-e2e.mjs` (18, Supabase real) | revisão jurídica |
+| C2 | Ambiente real: solicitação de contratação (RPC `request_saas_contract`, preço do servidor, idempotente, nunca “assinado”) | `/planos` | integração parcial validada | RLS 56/56, E2E conectado | provedor de assinatura, gateway |
 | C3 | Estados independentes contrato/pagamento/SaaS; idempotência; ativação só por eventos | — | frontend validado | unit (16) | backend |
 | C4 | Meu plano e contrato (cópia final, aditivos, faturas, cancelamento com protocolo, exportação) | `/app/:slug/meu-plano` | frontend validado | E2E | — |
 | C5 | Contratos SaaS e Contratação (contratada, quadro comercial, modelos versionados) | `/master/contratos`, `/master/contratacao` | frontend validado | E2E (suporte sem edição; publicação exige revisões) | aprovação comercial/jurídica |
 | C6 | Modelo Supabase, RLS e Edge Functions da contratação | — | integração futura | `docs/contratacao/MODELO_SUPABASE.md` | Supabase + provedores |
-Detalhes: `docs/contratacao/QA_CONTRATACAO.md` e `docs/contratacao/PENDENCIAS.md`.
+Detalhes: `docs/contratacao/QA_CONTRATO_NOS_PLANOS.md` (atual), `QA_CONTRATACAO.md` (histórico) e `PENDENCIAS.md`.

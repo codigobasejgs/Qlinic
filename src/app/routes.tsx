@@ -1,6 +1,6 @@
 // Mapa de rotas. Páginas carregadas sob demanda (lazy) por módulo.
 import { lazy, Suspense, type ComponentType } from 'react'
-import { createBrowserRouter, Link, Outlet, useRouteError, isRouteErrorResponse } from 'react-router'
+import { createBrowserRouter, Link, Navigate, Outlet, useRouteError, isRouteErrorResponse, useSearchParams } from 'react-router'
 // Ambientes autenticados (layouts, gates, seeds de tenant) ficam fora do bundle do site comercial.
 const appShell = () => import('./shells')
 const StaffGate = lazy(() => appShell().then((m) => ({ default: m.StaffGate })))
@@ -31,6 +31,17 @@ const portal = () => import('@/modules/portal/pages')
 const clinicPub = () => import('@/modules/portal/public')
 const settings = () => import('@/modules/settings/pages')
 const ctr = () => import('@/modules/contracts/pages')
+
+/** /contratar?plano=X → /planos?plano=X&ciclo=Y#contratacao. Demais parâmetros são descartados (nunca PII). */
+function LegacyCheckoutRedirect() {
+  const [sp] = useSearchParams()
+  const n = new URLSearchParams()
+  const plano = sp.get('plano'), ciclo = sp.get('ciclo')
+  if (plano && /^[a-z0-9_-]{1,60}$/i.test(plano)) n.set('plano', plano)
+  if (ciclo && ['mensal', 'trimestral', 'anual'].includes(ciclo)) n.set('ciclo', ciclo)
+  const q = n.toString()
+  return <Navigate to={`/planos${q ? `?${q}#contratacao` : ''}`} replace />
+}
 
 export function NotFound() {
   return (
@@ -63,8 +74,9 @@ export const router = createBrowserRouter([
       { path: '/segmentos/:segmento', element: L(pub, 'SegmentPage') },
       { path: '/planos', element: L(pub, 'PlansPage') },
       { path: '/recursos', element: L(pub, 'FeaturesPage') },
-      { path: '/contrato', element: L(ctr, 'ContractPublicPage') },
-      { path: '/contratar', element: L(ctr, 'ContractCheckoutPage') },
+      // rotas antigas da contratação → /planos (só parâmetros comerciais; nenhum callback/token usa estas rotas)
+      { path: '/contrato', element: <Navigate to="/planos" replace /> },
+      { path: '/contratar', element: <LegacyCheckoutRedirect /> },
       { path: '/ajuda', element: L(help, 'PublicHelpCenter') },
       { path: '/ajuda/:artigo', element: L(help, 'PublicHelpArticle') },
       { path: '/demonstracao', element: L(pub, 'DemoPickerPage') },
