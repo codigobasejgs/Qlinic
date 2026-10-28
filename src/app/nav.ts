@@ -4,7 +4,7 @@ import type { Resource } from '@/domain/permissions'
 import {
   LayoutDashboard, CalendarDays, ConciergeBell, ListOrdered, Users, FileText, ClipboardList, Stethoscope, Smile, PawPrint, Sparkles, Brain,
   Activity, Apple, Network, ShieldCheck, Kanban, Receipt, Wallet, Percent, Calculator, Package, ShoppingCart, MessageSquare, Bot, Workflow,
-  BarChart3, Upload, Settings, Palette, KeyRound, ScrollText, LifeBuoy, Rocket, type LucideIcon,
+  BarChart3, Upload, Settings, Palette, KeyRound, ScrollText, LifeBuoy, Rocket, FileSignature, type LucideIcon,
 } from 'lucide-react'
 
 export interface NavItem {
@@ -53,6 +53,7 @@ export const STAFF_NAV: NavItem[] = [
   { path: 'permissoes', label: 'Permissões', icon: KeyRound, group: 'Gestão', resource: 'equipe' },
   { path: 'auditoria', label: 'Auditoria', icon: ScrollText, group: 'Gestão', resource: 'auditoria' },
   { path: 'onboarding', label: 'Configuração inicial', icon: Rocket, group: 'Gestão', resource: 'configuracoes' },
+  { path: 'meu-plano', label: 'Meu plano e contrato', icon: FileSignature, group: 'Gestão', resource: 'configuracoes' },
   { path: 'ajuda', label: 'Ajuda e treinamento', icon: LifeBuoy, group: 'Gestão' },
 ]
 
@@ -63,6 +64,8 @@ export const MASTER_NAV = [
   { path: 'testes', label: 'Testes (trial)', area: 'testes' },
   { path: 'assinaturas', label: 'Assinaturas', area: 'assinaturas' },
   { path: 'cobranca', label: 'Cobrança SaaS', area: 'cobranca' },
+  { path: 'contratos', label: 'Contratos SaaS', area: 'contratos' },
+  { path: 'contratacao', label: 'Contratação', area: 'contratos' },
   { path: 'integracoes', label: 'Integrações', area: 'integracoes' },
   { path: 'dominios', label: 'Domínios e PWA', area: 'dominios' },
   { path: 'suporte', label: 'Suporte', area: 'suporte' },

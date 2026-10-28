@@ -139,3 +139,29 @@ export function isValidCPF(v: string): boolean {
   }
   return calc(9) === Number(d[9]) && calc(10) === Number(d[10])
 }
+export function isValidCNPJ(v: string): boolean {
+  const d = v.replace(/\D/g, '')
+  if (d.length !== 14 || /^(\d)\1+$/.test(d)) return false
+  const calc = (len: number) => {
+    const w = len === 12 ? [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2] : [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
+    const r = w.reduce((s, x, i) => s + x * Number(d[i]), 0) % 11
+    return r < 2 ? 0 : 11 - r
+  }
+  return calc(12) === Number(d[12]) && calc(13) === Number(d[13])
+}
+/** CNPJ fictício com dígitos válidos (raiz 00.000.xxx). */
+export function fakeCNPJ(n: number): string {
+  const base = ('00000' + String(100 + (n % 900))).slice(-8) + '0001'
+  let d = base
+  for (const len of [12, 13]) {
+    const w = len === 12 ? [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2] : [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
+    const r = w.reduce((s, x, i) => s + x * Number(d[i]), 0) % 11
+    d += String(r < 2 ? 0 : 11 - r)
+  }
+  return maskCNPJ(d)
+}
+/** CPF para listas/logs: só o miolo visível (***.456.789-**). */
+export function maskCPFPartial(v: string): string {
+  const d = v.replace(/\D/g, '')
+  return d.length === 11 ? `***.${d.slice(3, 6)}.${d.slice(6, 9)}-**` : '***'
+}

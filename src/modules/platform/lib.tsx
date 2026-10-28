@@ -9,9 +9,9 @@ import type { BillingCycle, DataRequest, DomainConfig, Incident, IntegrationHeal
 import { EmptyState, PageHeader, type Tone } from '@/ui/core'
 import { parseBRL } from '@/lib/money'
 
-export type Area = 'dashboard' | 'contratantes' | 'planos' | 'testes' | 'assinaturas' | 'cobranca' | 'integracoes' | 'dominios' | 'suporte' | 'operacao' | 'governanca' | 'custos'
+export type Area = 'dashboard' | 'contratantes' | 'planos' | 'testes' | 'assinaturas' | 'cobranca' | 'contratos' | 'integracoes' | 'dominios' | 'suporte' | 'operacao' | 'governanca' | 'custos'
 export const AREA_LABEL: Record<Area, string> = {
-  dashboard: 'Dashboard', contratantes: 'Contratantes', planos: 'Planos', testes: 'Testes (trial)', assinaturas: 'Assinaturas', cobranca: 'Cobrança SaaS',
+  dashboard: 'Dashboard', contratantes: 'Contratantes', planos: 'Planos', testes: 'Testes (trial)', assinaturas: 'Assinaturas', cobranca: 'Cobrança SaaS', contratos: 'Contratos SaaS',
   integracoes: 'Integrações', dominios: 'Domínios e PWA', suporte: 'Suporte', operacao: 'Operação', governanca: 'Governança', custos: 'Custos e margem',
 }
 

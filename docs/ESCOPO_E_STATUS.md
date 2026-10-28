@@ -147,3 +147,14 @@ Estados: **não iniciado** · **frontend implementado** (código pronto, sem ver
 2. Testes em Firefox/WebKit e aparelhos físicos (instalação PWA iOS/Android).
 3. Percorrer no navegador os itens “frontend implementado” acima.
 4. Etapa de backend (`PROXIMA_ETAPA_BACKEND.md`), somente com autorização.
+
+## Contratação SaaS (complemento v1.0 — 28/10/2026)
+| Req. | Item | Rota/ambiente | Estado | Evidência | Dependência externa |
+|---|---|---|---|---|---|
+| C1 | Página pública do contrato (modelo vigente, contratada, sem dados de clientes) | `/contrato` | frontend validado | E2E `contracts.spec.ts` | revisão jurídica |
+| C2 | Jornada plano → dados → revisão → assinatura → pagamento → onboarding | `/contratar?plano=` | frontend validado | E2E + unit `contracts.test.ts` | provedor de assinatura, gateway |
+| C3 | Estados independentes contrato/pagamento/SaaS; idempotência; ativação só por eventos | — | frontend validado | unit (16) | backend |
+| C4 | Meu plano e contrato (cópia final, aditivos, faturas, cancelamento com protocolo, exportação) | `/app/:slug/meu-plano` | frontend validado | E2E | — |
+| C5 | Contratos SaaS e Contratação (contratada, quadro comercial, modelos versionados) | `/master/contratos`, `/master/contratacao` | frontend validado | E2E (suporte sem edição; publicação exige revisões) | aprovação comercial/jurídica |
+| C6 | Modelo Supabase, RLS e Edge Functions da contratação | — | integração futura | `docs/contratacao/MODELO_SUPABASE.md` | Supabase + provedores |
+Detalhes: `docs/contratacao/QA_CONTRATACAO.md` e `docs/contratacao/PENDENCIAS.md`.

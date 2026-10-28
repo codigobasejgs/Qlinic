@@ -105,9 +105,10 @@ export function allowedUnitIds(ctx: AccessContext, allUnitIds: ID[]): ID[] {
 
 /** Plataforma: suporte NUNCA recebe leitura automática de prontuário. */
 export const PLATFORM_MATRIX: Record<PlatformRole, string[]> = {
-  platform_owner: ['dashboard', 'contratantes', 'planos', 'testes', 'assinaturas', 'cobranca', 'integracoes', 'dominios', 'suporte', 'operacao', 'governanca', 'custos'],
-  platform_finance: ['dashboard', 'contratantes', 'planos', 'assinaturas', 'cobranca', 'custos'],
-  platform_support: ['dashboard', 'contratantes', 'suporte', 'integracoes', 'dominios', 'operacao'],
+  // contratos: suporte consulta (sem editar modelo nem forçar assinatura; ações exigem platform_owner/finance na UI)
+  platform_owner: ['dashboard', 'contratantes', 'planos', 'testes', 'assinaturas', 'cobranca', 'contratos', 'integracoes', 'dominios', 'suporte', 'operacao', 'governanca', 'custos'],
+  platform_finance: ['dashboard', 'contratantes', 'planos', 'assinaturas', 'cobranca', 'contratos', 'custos'],
+  platform_support: ['dashboard', 'contratantes', 'contratos', 'suporte', 'integracoes', 'dominios', 'operacao'],
 }
 export function canPlatform(role: PlatformRole, area: string) {
   return PLATFORM_MATRIX[role].includes(area)

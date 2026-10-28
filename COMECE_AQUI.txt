@@ -1,16 +1,12 @@
-QLINIC — PACOTE INICIAL
+Extraia esta pasta dentro do projeto Qlinic e envie ao Claude Code:
 
-1. Extraia este ZIP em uma pasta local destinada ao Qlinic.
-2. Abra a pasta que contém PROMPT_MASTER_QLINIC_CLAUDE_CODE.md no Claude Code.
-3. Envie a instrução abaixo:
+Leia integralmente PROMPT_CONTRATACAO_QLINIC_CLAUDE_CODE.md,
+docs/contratacao/CONTRATO_QLINIC_MINUTA.md e docs/contratacao/dados-contratada.json.
+Implemente o módulo completo de contratação do SaaS conforme esses arquivos,
+preservando o restante do projeto e sua identidade visual. Faça o frontend
+funcional com simulação explícita das integrações, execute o QA e documente
+as dependências de backend. Não se limite a apresentar um plano.
 
-Leia integralmente PROMPT_MASTER_QLINIC_CLAUDE_CODE.md e execute o projeto.
-Ainda não existe uma aplicação; os arquivos desta pasta são o pacote inicial.
-Preserve public/brand, design-system e docs. Aplique a identidade fornecida,
-sem recriar o logo. Desenvolva primeiro todo o frontend e valide os fluxos,
-responsividade, PWA e acessibilidade. Backend e integrações reais serão posteriores.
-Comece pela inspeção da pasta e prossiga para implementação conforme o documento.
-
-Não precisa anexar os PNGs um por um: eles já estão em public/brand/png.
-Use o prompt desta versão 1.1 no lugar da versão anterior.
-Este ZIP não é ainda o código do sistema; é o material para iniciar a construção.
+Este complemento não substitui o prompt mestre do ERP. Se ainda não houver
+aplicação, implemente junto ao prompt mestre. Os campos comerciais e de
+representação pendentes precisam ser aprovados antes de assinatura real.

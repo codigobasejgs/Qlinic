@@ -30,6 +30,7 @@ const eng = () => import('@/modules/engagement/pages')
 const portal = () => import('@/modules/portal/pages')
 const clinicPub = () => import('@/modules/portal/public')
 const settings = () => import('@/modules/settings/pages')
+const ctr = () => import('@/modules/contracts/pages')
 
 export function NotFound() {
   return (
@@ -62,6 +63,8 @@ export const router = createBrowserRouter([
       { path: '/segmentos/:segmento', element: L(pub, 'SegmentPage') },
       { path: '/planos', element: L(pub, 'PlansPage') },
       { path: '/recursos', element: L(pub, 'FeaturesPage') },
+      { path: '/contrato', element: L(ctr, 'ContractPublicPage') },
+      { path: '/contratar', element: L(ctr, 'ContractCheckoutPage') },
       { path: '/ajuda', element: L(help, 'PublicHelpCenter') },
       { path: '/ajuda/:artigo', element: L(help, 'PublicHelpArticle') },
       { path: '/demonstracao', element: L(pub, 'DemoPickerPage') },
@@ -80,6 +83,8 @@ export const router = createBrowserRouter([
           { path: 'testes', element: L(master, 'TrialsPage') },
           { path: 'assinaturas', element: L(master, 'SubscriptionsPage') },
           { path: 'cobranca', element: L(master, 'SaasBillingPage') },
+          { path: 'contratos', element: L(ctr, 'SaasContractsPage') },
+          { path: 'contratacao', element: L(ctr, 'ContractSettingsPage') },
           { path: 'integracoes', element: L(master, 'IntegrationsHealthPage') },
           { path: 'dominios', element: L(master, 'DomainsPwaPage') },
           { path: 'suporte', element: L(master, 'SupportPage') },
@@ -127,6 +132,7 @@ export const router = createBrowserRouter([
           { path: 'permissoes', element: L(settings, 'PermissionsPage') },
           { path: 'auditoria', element: L(settings, 'AuditPage') },
           { path: 'onboarding', element: L(settings, 'OnboardingPage') },
+          { path: 'meu-plano', element: L(ctr, 'MyPlanContractPage') },
           { path: 'ajuda', element: L(help, 'StaffHelpPage') },
           { path: 'ajuda/:artigo', element: L(help, 'StaffHelpArticle') },
           { path: '*', element: <NotFound /> },

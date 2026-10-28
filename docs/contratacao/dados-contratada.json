@@ -1,0 +1,28 @@
+{
+  "product_name": "Qlinic",
+  "legal_name": "59.760.458 MARCO ANTONIO BOGGIAN",
+  "tax_id": "59760458000191",
+  "tax_id_formatted": "59.760.458/0001-91",
+  "legal_nature": "Empresário (Individual)",
+  "trade_name_registered": null,
+  "address": {
+    "street": "Rua Jacques Pilon",
+    "number": "189",
+    "complement": null,
+    "district": "Vila Piauí",
+    "city": "São Paulo",
+    "state": "SP",
+    "postal_code": "05109160"
+  },
+  "registered_email": "marco.boggian@gmail.com",
+  "registered_phone": "+551136218304",
+  "source": "Comprovante de inscrição e situação cadastral fornecido pelo proprietário, emitido em 28/10/2026",
+  "source_is_live_registry_check": false,
+  "authorized_signatory": null,
+  "contract_contact_confirmed": false,
+  "privacy_contact": null,
+  "support_channels": [],
+  "legal_review_status": "pending",
+  "commercial_terms_status": "pending",
+  "production_signature_enabled": false
+}

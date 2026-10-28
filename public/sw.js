@@ -14,7 +14,7 @@ const SHELL = `qlinic-shell-${VERSION}`
 const ASSETS = `qlinic-assets-${VERSION}`
 const BRAND = (slug) => `qlinic-brand-${slug || 'qlinic'}-${VERSION}`
 
-const NEVER = [/^\/api\//, /^\/auth\//, /\/proposta\//, /token=/i, /\.webmanifest$/]
+const NEVER = [/^\/api\//, /^\/auth\//, /\/proposta\//, /token=/i, /\.webmanifest$/, /^\/contratar/, /\/meu-plano/, /assinatura|envelope|contrato-final/i]
 
 self.addEventListener('install', (event) => {
   event.waitUntil((async () => {

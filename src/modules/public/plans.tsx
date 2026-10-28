@@ -1,5 +1,6 @@
 // Planos lidos de platformDb 'plans' (editáveis no Super Admin). Tabela no desktop, cartões no celular.
 import { useState } from 'react'
+import { Link } from 'react-router'
 import { Check, Minus } from 'lucide-react'
 import { usePlatformCollection } from '@/data/store'
 import type { BillingCycle, Plan } from '@/domain/platform'
@@ -32,6 +33,10 @@ const MODULE_ROWS: ModuleKey[] = ['agenda', 'prontuario', 'portal', 'pwa', 'fina
 function Has({ ok }: { ok: boolean }) {
   return ok ? <><Check size={18} aria-hidden="true" className="pub-ok" /><span className="sr-only">Incluído</span></> : <><Minus size={18} aria-hidden="true" className="muted" /><span className="sr-only">Não incluído</span></>
 }
+/** “Assinar” inicia a jornada (escolha → dados → revisão); não registra assinatura. */
+function SignCta({ p }: { p: Plan }) {
+  return <Link to={`/contratar?plano=${encodeURIComponent(p.id)}`} className="btn btn-primary btn-sm" aria-label={`Assinar plano ${p.name}`}>Assinar plano</Link>
+}
 function modLabel(m: ModuleKey) { return m === 'odontologia' ? 'Módulos de especialidade' : MODULE_LABEL[m] }
 
 export function PlansCompare({ compact }: { compact?: boolean }) {
@@ -57,6 +62,7 @@ export function PlansCompare({ compact }: { compact?: boolean }) {
           <thead><tr><th scope="col">Item</th>{plans.map((p) => <th key={p.id} scope="col">{p.name}</th>)}</tr></thead>
           <tbody>
             <tr><th scope="row">Preço</th>{plans.map((p) => <td key={p.id}>{price(p)}</td>)}</tr>
+            <tr><th scope="row"><span className="sr-only">Contratar</span></th>{plans.map((p) => <td key={p.id}><SignCta p={p} /></td>)}</tr>
             <tr><th scope="row">Indicado para</th>{plans.map((p) => <td key={p.id} className="small">{p.description}</td>)}</tr>
             {LIMIT_ROWS.map((r) => <tr key={r.label}><th scope="row">{r.label}</th>{plans.map((p) => <td key={p.id} className="num">{r.get(p)}</td>)}</tr>)}
             {!compact && OVERAGE_ROWS.map((r) => <tr key={r.label}><th scope="row">{r.label}</th>{plans.map((p) => <td key={p.id} className="num">{r.get(p)}</td>)}</tr>)}
@@ -71,6 +77,7 @@ export function PlansCompare({ compact }: { compact?: boolean }) {
             <h2 id={`plan-${p.id}`} style={{ fontSize: 18 }}>{p.name}</h2>
             <p className="small muted">{p.description}</p>
             {price(p)}
+            <SignCta p={p} />
             <dl className="pub-dl">
               {LIMIT_ROWS.map((r) => <div key={r.label}><dt>{r.label}</dt><dd className="num">{r.get(p)}</dd></div>)}
               {!compact && OVERAGE_ROWS.map((r) => <div key={r.label}><dt>{r.label}</dt><dd className="num">{r.get(p)}</dd></div>)}
@@ -79,6 +86,7 @@ export function PlansCompare({ compact }: { compact?: boolean }) {
           </article>
         ))}
       </div>
+      <p className="small">Condições gerais: <Link to="/contrato">leia o contrato</Link>. “Assinar plano” abre a contratação com revisão do contrato antes de qualquer assinatura.</p>
       <p className="small muted">Preços e limites são de demonstração, lidos do cadastro de planos do Super Admin, e podem ser alterados lá. Upgrade: {plans[0].upgradeRule === 'imediato_pro_rata' ? 'imediato, proporcional ao período' : 'no próximo ciclo'}. Downgrade: {plans[0].downgradeRule === 'proximo_ciclo' ? 'no próximo ciclo' : 'imediato, sem reembolso'}.</p>
     </div>
   )

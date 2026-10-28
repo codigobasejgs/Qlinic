@@ -3,4 +3,5 @@ Disallow: /app/
 Disallow: /master/
 Disallow: /c/*/portal/
 Disallow: /c/*/proposta/
+Disallow: /contratar
 Allow: /
